@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>“旭东”公司客户生命周期分析</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 引入 ECharts 强大的数据可视化库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    
+    <style>
+        /* 隐藏滚动条但保留滚动功能 */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        /* 动画过渡 */
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 适配刘海屏底部 */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <!-- ================= 1. 全屏封面页 ================= -->
+    <div id="view-cover" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+        <!-- 背景装饰光晕 -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-64 h-64 sm:w-96 sm:h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[90px] sm:blur-[128px] opacity-40 animate-pulse"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-64 h-64 sm:w-96 sm:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-[90px] sm:blur-[128px] opacity-40 animate-pulse" style="animation-delay: 2s"></div>
+        </div>
+
+        <div class="z-10 max-w-5xl w-full space-y-8 sm:space-y-12 animate-slide-up mt-8 sm:mt-0 mb-16 sm:mb-0">
+            <!-- 抬头信息 -->
+            <div class="text-center space-y-4 sm:space-y-6">
+                <div class="inline-flex items-center justify-center p-3 sm:p-4 bg-white/10 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/20 mb-2 shadow-2xl">
+                    <i data-lucide="bar-chart-2" class="w-10 h-10 sm:w-16 sm:h-16 text-blue-300"></i>
+                </div>
+                <h1 class="text-3xl sm:text-4xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg leading-tight">
+                    “旭东”公司<br class="sm:hidden" />
+                    <span class="text-blue-400 ml-0 sm:ml-2">客户生命周期分析</span>
+                </h1>
+                <p class="text-lg sm:text-xl md:text-2xl text-blue-100 font-light max-w-2xl mx-auto leading-relaxed px-2">
+                    基于 2015-2024 年全量交易数据测算
+                </p>
+                <p class="text-xs sm:text-sm md:text-base text-slate-300 max-w-3xl mx-auto leading-relaxed mt-4 px-4 hidden sm:block">
+                    通过分析过去十年的客户交易变动轨迹，建立客户生命周期模型，准确评估客户群体质量，诊断客户流失与新客开发面临的严峻挑战，为精准营销提供数据支撑。
+                </p>
+            </div>
+
+            <!-- 功能模块预览卡片 (PC端3列，移动端单列堆叠) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 px-4 sm:px-2">
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all cursor-pointer" onclick="switchTab('data')">
+                    <i data-lucide="table" class="w-8 h-8 text-blue-300"></i>
+                    <h3 class="text-white font-bold text-base sm:text-lg">数据总览</h3>
+                    <p class="text-blue-100/70 text-xs sm:text-sm">十年交易明细与生命周期模式归类</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all cursor-pointer" onclick="switchTab('chart')">
+                    <i data-lucide="line-chart" class="w-8 h-8 text-purple-300"></i>
+                    <h3 class="text-white font-bold text-base sm:text-lg">生命周期图</h3>
+                    <p class="text-blue-100/70 text-xs sm:text-sm">可视化呈现客户交易波动轨迹</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all cursor-pointer" onclick="switchTab('analysis')">
+                    <i data-lucide="activity" class="w-8 h-8 text-rose-300"></i>
+                    <h3 class="text-white font-bold text-base sm:text-lg">诊断与问题</h3>
+                    <p class="text-blue-100/70 text-xs sm:text-sm">深入剖析客户质量与潜在流失风险</p>
+                </div>
+            </div>
+
+            <!-- 开始分析按钮 -->
+            <div class="text-center mt-8 sm:mt-16 pt-4 sm:pt-8">
+                <button onclick="switchTab('data')" class="group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-8 sm:px-10 py-4 sm:py-5 font-bold text-white bg-blue-600 rounded-full overflow-hidden shadow-xl shadow-blue-900/50 hover:bg-blue-500 transition-all hover:scale-105 active:scale-95 w-[80%] sm:w-auto">
+                    <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                    <span class="text-lg sm:text-xl relative">进入数据看板</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 sm:w-6 sm:h-6 relative fill-current group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 2. 主仪表盘区域 ================= -->
+    <div id="dashboard-layout" class="hidden min-h-screen flex-col">
+        <!-- 顶部标题栏 -->
+        <header class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white pt-6 pb-6 px-4 sm:px-8 shadow-md sticky top-0 z-30">
+            <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm cursor-pointer" onclick="switchTab('cover')">
+                        <i data-lucide="bar-chart-2" class="w-6 h-6 sm:w-8 sm:h-8 text-blue-100 hover:text-white transition-colors"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-wide">“旭东”公司客户生命周期分析</h1>
+                        <p class="text-xs sm:text-sm text-blue-200 mt-1">基于 2015-2024 年全量交易数据测算</p>
+                    </div>
+                </div>
+                
+                <!-- PC端导航栏 -->
+                <div class="hidden sm:flex bg-white/10 p-1 rounded-lg backdrop-blur-sm border border-white/10" id="desktop-nav">
+                    <button onclick="switchTab('cover')" class="px-4 py-2 rounded-md text-sm font-medium transition-all text-blue-200 hover:text-white hover:bg-white/10 flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i> 首页
+                    </button>
+                    <button onclick="switchTab('data')" data-tab="data" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition-all bg-white text-blue-900 shadow-sm ml-2">数据总览</button>
+                    <button onclick="switchTab('chart')" data-tab="chart" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition-all text-white hover:bg-white/10">生命周期图</button>
+                    <button onclick="switchTab('analysis')" data-tab="analysis" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition-all text-white hover:bg-white/10">诊断与问题</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主体内容区 -->
+        <main class="max-w-6xl mx-auto px-4 py-6 sm:py-8 pb-24 sm:pb-12 flex-grow w-full">
+
+            <!-- ================= 视图 A：数据总览 ================= -->
+            <div id="view-data" class="tab-view animate-fade-in space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="table" class="w-5 h-5 text-blue-600"></i> 客户交易明细与生命周期模式
+                    </h2>
+                    <span class="text-xs text-slate-500 sm:hidden flex items-center gap-1">
+                        <i data-lucide="hand" class="w-3 h-3"></i> 左右滑动表格
+                    </span>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto scrollbar-hide">
+                    <table class="w-full text-xs sm:text-sm text-center whitespace-nowrap">
+                        <thead class="bg-slate-100 border-b border-slate-200 text-slate-700">
+                            <tr>
+                                <th class="p-3 font-bold sticky left-0 bg-slate-100 shadow-[1px_0_0_0_#e2e8f0] z-10">客户名称</th>
+                                <th class="p-3">2015年</th>
+                                <th class="p-3">2016年</th>
+                                <th class="p-3">2017年</th>
+                                <th class="p-3">2018年</th>
+                                <th class="p-3">2019年</th>
+                                <th class="p-3">2020年</th>
+                                <th class="p-3">2021年</th>
+                                <th class="p-3">2022年</th>
+                                <th class="p-3">2023年</th>
+                                <th class="p-3">2024年</th>
+                                <th class="p-3 font-bold text-indigo-700 sticky right-0 bg-slate-100 shadow-[-1px_0_0_0_#e2e8f0] z-10">客户生命周期模式</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-600">
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">A</td><td class="p-3">0</td><td class="p-3">30</td><td class="p-3">45</td><td class="p-3">90</td><td class="p-3">120</td><td class="p-3">150</td><td class="p-3">125</td><td class="p-3">150</td><td class="p-3">135</td><td class="p-3">145</td><td class="p-3 font-semibold text-emerald-600 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">长久保持型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">B</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3 font-semibold text-rose-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">早期流产型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">C</td><td class="p-3">50</td><td class="p-3">90</td><td class="p-3">120</td><td class="p-3">150</td><td class="p-3">70</td><td class="p-3">30</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3 font-semibold text-amber-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">中途夭折型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">D</td><td class="p-3">50</td><td class="p-3">70</td><td class="p-3">145</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3 font-semibold text-amber-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">中途夭折型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">E</td><td class="p-3">30</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">60</td><td class="p-3">120</td><td class="p-3">150</td><td class="p-3">150</td><td class="p-3 font-semibold text-slate-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">不明确</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">F</td><td class="p-3">30</td><td class="p-3">80</td><td class="p-3">120</td><td class="p-3">150</td><td class="p-3">160</td><td class="p-3">140</td><td class="p-3">165</td><td class="p-3">155</td><td class="p-3">80</td><td class="p-3">20</td><td class="p-3 font-semibold text-emerald-600 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">长久保持型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">G</td><td class="p-3">60</td><td class="p-3">180</td><td class="p-3">60</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3 font-semibold text-amber-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">中途夭折型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">H</td><td class="p-3">45</td><td class="p-3">80</td><td class="p-3">60</td><td class="p-3">50</td><td class="p-3">70</td><td class="p-3">80</td><td class="p-3">75</td><td class="p-3">55</td><td class="p-3">20</td><td class="p-3">60</td><td class="p-3 font-semibold text-orange-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">提前退出型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">I</td><td class="p-3">180</td><td class="p-3">170</td><td class="p-3">60</td><td class="p-3">20</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3 font-semibold text-orange-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">提前退出型</td></tr>
+                            <tr class="hover:bg-slate-50"><td class="p-3 font-bold sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">J</td><td class="p-3">20</td><td class="p-3">50</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3">0</td><td class="p-3 font-semibold text-rose-500 sticky right-0 bg-white shadow-[-1px_0_0_0_#e2e8f0] z-10">早期流产型</td></tr>
+                            <!-- 总计行 -->
+                            <tr class="bg-blue-50 font-bold text-blue-900 border-t-2 border-blue-200">
+                                <td class="p-3 sticky left-0 bg-blue-50 shadow-[1px_0_0_0_#bfdbfe] z-10">总计(万元)</td>
+                                <td class="p-3">465</td><td class="p-3">750</td><td class="p-3">610</td><td class="p-3">460</td><td class="p-3">420</td><td class="p-3">400</td><td class="p-3">425</td><td class="p-3">480</td><td class="p-3">385</td><td class="p-3">375</td>
+                                <td class="p-3 sticky right-0 bg-blue-50 shadow-[-1px_0_0_0_#bfdbfe] z-10">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-slate-400 text-right mt-2">* 数据来源：“旭东”公司客户信息-效果.xlsx</p>
+            </div>
+
+            <!-- ================= 视图 B：生命周期图 ================= -->
+            <div id="view-chart" class="tab-view hidden animate-fade-in space-y-4">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="line-chart" class="w-5 h-5 text-indigo-600"></i> 客户生命周期折线图
+                </h2>
+                
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-2 sm:p-4">
+                    <!-- 图表交互筛选区 -->
+                    <div class="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
+                        <span class="text-xs sm:text-sm font-medium text-slate-500 py-1.5 hidden sm:block">按生命周期模式高亮查看：</span>
+                        <button onclick="filterChart('all')" class="chart-filter-btn active px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-slate-800 text-white transition-all">显示全部</button>
+                        <button onclick="filterChart('长久保持型')" class="chart-filter-btn px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition-all">长久保持型 (A,F)</button>
+                        <button onclick="filterChart('中途夭折型')" class="chart-filter-btn px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition-all">中途夭折型 (C,D,G)</button>
+                        <button onclick="filterChart('提前退出型')" class="chart-filter-btn px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition-all">提前退出型 (H,I)</button>
+                        <button onclick="filterChart('早期流产型')" class="chart-filter-btn px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition-all">早期流产型 (B,J)</button>
+                        <button onclick="filterChart('不明确')" class="chart-filter-btn px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition-all">不明确 (E)</button>
+                    </div>
+
+                    <!-- ECharts 图表容器 -->
+                    <div id="lifecycleChart" class="w-full h-[350px] sm:h-[500px]"></div>
+                </div>
+            </div>
+
+            <!-- ================= 视图 C：诊断与问题 ================= -->
+            <div id="view-analysis" class="tab-view hidden animate-fade-in space-y-6">
+                
+                <!-- 质量判断模块 -->
+                <div class="bg-white border-t-4 border-indigo-500 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-indigo-600"></i>
+                        <h2 class="text-lg font-bold text-slate-800">1、客户群体质量判断</h2>
+                    </div>
+                    <div class="p-5 sm:p-6 space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
+                                <div class="text-emerald-800 font-bold mb-1">长久保持型客户占比</div>
+                                <div class="text-2xl font-black text-emerald-600">2 / 10</div>
+                                <div class="text-xs text-emerald-600/80 mt-1">客户 A 和客户 F</div>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-100 p-4 rounded-lg">
+                                <div class="text-amber-800 font-bold mb-1">中途夭折/提前退出型</div>
+                                <div class="text-2xl font-black text-amber-600">6 / 10</div>
+                                <div class="text-xs text-amber-600/80 mt-1">客户 C、D、G、H、I、J</div>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-100 p-4 rounded-lg">
+                                <div class="text-rose-800 font-bold mb-1">早期流产型客户占比</div>
+                                <div class="text-2xl font-black text-rose-600">2 / 10</div>
+                                <div class="text-xs text-rose-600/80 mt-1">客户 B 和 J <br/>*(注：文档原话指出J被重复计算)*</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 border-l-4 border-indigo-400 p-4 rounded-r-lg">
+                            <h3 class="font-bold text-slate-700 mb-2">综合诊断分析：</h3>
+                            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                                从整体上看，“旭东”公司的<strong class="text-slate-800">客户群体质量不高</strong>。长久保持型客户占比较少，而中途夭折型和提前退出型客户占比较大。这表明该公司在<strong class="text-slate-800">客户维护、产品或服务质量、市场竞争等方面</strong>可能存在一定的问题。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 面临的问题模块 -->
+                <div class="bg-white border-t-4 border-rose-500 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
+                        <h2 class="text-lg font-bold text-slate-800">2、面临的问题</h2>
+                    </div>
+                    <div class="p-5 sm:p-6">
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-rose-100 p-1.5 rounded-full shrink-0"><i data-lucide="user-minus" class="w-4 h-4 text-rose-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm sm:text-base">客户流失严重</h4>
+                                    <p class="text-sm text-slate-600 mt-1">中途夭折型和提前退出型客户占比较大，说明公司存在客户流失严重的问题。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-amber-100 p-1.5 rounded-full shrink-0"><i data-lucide="search-x" class="w-4 h-4 text-amber-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm sm:text-base">新客户开发不足</h4>
+                                    <p class="text-sm text-slate-600 mt-1">早期流产型客户占比较大，说明该公司在新客户开发方面可能存在不足。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-blue-100 p-1.5 rounded-full shrink-0"><i data-lucide="swords" class="w-4 h-4 text-blue-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm sm:text-base">市场竞争激烈</h4>
+                                    <p class="text-sm text-slate-600 mt-1">从客户流失和新客户开发不足的情况可以推断出，该公司在市场竞争中可能面临着较大的压力。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-purple-100 p-1.5 rounded-full shrink-0"><i data-lucide="package-minus" class="w-4 h-4 text-purple-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm sm:text-base">产品或服务质量不稳定</h4>
+                                    <p class="text-sm text-slate-600 mt-1">部分客户在某个阶段与该公司中断了合作关系，可能是由于产品或服务质量不稳定导致的。</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- 移动端底部导航栏 (数据看板专属) -->
+        <div id="mobile-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 z-50 justify-around items-center px-1 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+            <button onclick="switchTab('cover')" class="flex flex-col items-center justify-center w-1/4 py-2 text-slate-400">
+                <i data-lucide="home" class="w-5 h-5 mb-1"></i>
+                <span class="text-[10px] font-medium">首页</span>
+            </button>
+            <button onclick="switchTab('data')" data-tab="data" class="mobile-nav-btn flex flex-col items-center justify-center w-1/4 py-2 text-blue-600">
+                <i data-lucide="table" class="w-5 h-5 mb-1"></i>
+                <span class="text-[10px] font-medium">数据明细</span>
+            </button>
+            <button onclick="switchTab('chart')" data-tab="chart" class="mobile-nav-btn flex flex-col items-center justify-center w-1/4 py-2 text-slate-400">
+                <i data-lucide="line-chart" class="w-5 h-5 mb-1"></i>
+                <span class="text-[10px] font-medium">图表分析</span>
+            </button>
+            <button onclick="switchTab('analysis')" data-tab="analysis" class="mobile-nav-btn flex flex-col items-center justify-center w-1/4 py-2 text-slate-400">
+                <i data-lucide="activity" class="w-5 h-5 mb-1"></i>
+                <span class="text-[10px] font-medium">诊断分析</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 核心交互脚本 -->
+    <script>
+        // 初始化图标
+        lucide.createIcons();
+
+        /* ================= 1. 视图切换逻辑 ================= */
+        function switchTab(tabId) {
+            const isCover = tabId === 'cover';
+
+            // 切换大视图 (封面页 vs 数据看板页)
+            if (isCover) {
+                document.getElementById('view-cover').classList.remove('hidden');
+                document.getElementById('dashboard-layout').classList.add('hidden');
+                document.getElementById('mobile-nav').classList.add('hidden');
+                document.getElementById('mobile-nav').classList.remove('flex');
+            } else {
+                document.getElementById('view-cover').classList.add('hidden');
+                document.getElementById('dashboard-layout').classList.remove('hidden');
+                document.getElementById('dashboard-layout').classList.add('flex');
+                
+                // 在移动端尺寸下显示底部导航
+                if (window.innerWidth < 640) {
+                    document.getElementById('mobile-nav').classList.remove('hidden');
+                    document.getElementById('mobile-nav').classList.add('flex');
+                }
+
+                // 隐藏数据看板内所有子视图
+                document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+                // 显示目标子视图
+                document.getElementById('view-' + tabId).classList.remove('hidden');
+
+                // 更新 PC 端导航栏样式
+                document.querySelectorAll('#desktop-nav .nav-btn').forEach(btn => {
+                    if(btn.getAttribute('data-tab') === tabId) {
+                        btn.className = 'nav-btn px-4 py-2 rounded-md text-sm font-bold transition-all bg-white text-blue-900 shadow-sm transform scale-105';
+                    } else {
+                        btn.className = 'nav-btn px-4 py-2 rounded-md text-sm font-medium transition-all text-white hover:bg-white/10';
+                    }
+                });
+
+                // 更新移动端底部导航栏样式
+                document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                    if(btn.getAttribute('data-tab') === tabId) {
+                        btn.classList.add('text-blue-600');
+                        btn.classList.remove('text-slate-400');
+                    } else {
+                        btn.classList.remove('text-blue-600');
+                        btn.classList.add('text-slate-400');
+                    }
+                });
+
+                // 如果切换到图表页，需要调整图表大小以防止在隐藏时初始化导致的宽度异常
+                if(tabId === 'chart' && myChart) {
+                    setTimeout(() => { myChart.resize(); }, 100);
+                }
+            }
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 监听窗口大小变化以修正底部导航显示
+        window.addEventListener('resize', () => {
+            const dashboardLayout = document.getElementById('dashboard-layout');
+            const mobileNav = document.getElementById('mobile-nav');
+            if (!dashboardLayout.classList.contains('hidden')) {
+                if (window.innerWidth < 640) {
+                    mobileNav.classList.remove('hidden');
+                    mobileNav.classList.add('flex');
+                } else {
+                    mobileNav.classList.add('hidden');
+                    mobileNav.classList.remove('flex');
+                }
+            }
+        });
+
+        /* ================= 2. ECharts 图表绘制逻辑 ================= */
+        let myChart = null;
+
+        // 图表基础数据源 (完全按照文档提取)
+        const years = ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'];
+        const customerData = [
+            { name: 'A (长久保持)', type: '长久保持型', data: [0, 30, 45, 90, 120, 150, 125, 150, 135, 145] },
+            { name: 'B (早期流产)', type: '早期流产型', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { name: 'C (中途夭折)', type: '中途夭折型', data: [50, 90, 120, 150, 70, 30, 0, 0, 0, 0] },
+            { name: 'D (中途夭折)', type: '中途夭折型', data: [50, 70, 145, 0, 0, 0, 0, 0, 0, 0] },
+            { name: 'E (不明确)',   type: '不明确',     data: [30, 0, 0, 0, 0, 0, 60, 120, 150, 150] },
+            { name: 'F (长久保持)', type: '长久保持型', data: [30, 80, 120, 150, 160, 140, 165, 155, 80, 20] },
+            { name: 'G (中途夭折)', type: '中途夭折型', data: [60, 180, 60, 0, 0, 0, 0, 0, 0, 0] },
+            { name: 'H (提前退出)', type: '提前退出型', data: [45, 80, 60, 50, 70, 80, 75, 55, 20, 60] },
+            { name: 'I (提前退出)', type: '提前退出型', data: [180, 170, 60, 20, 0, 0, 0, 0, 0, 0] },
+            { name: 'J (早期流产)', type: '早期流产型', data: [20, 50, 0, 0, 0, 0, 0, 0, 0, 0] }
+        ];
+
+        // 颜色映射：根据不同的生命周期模式分配不同色系，方便识别
+        const colorMap = {
+            '长久保持型': '#10b981', // Emerald
+            '中途夭折型': '#f59e0b', // Amber
+            '提前退出型': '#f97316', // Orange
+            '早期流产型': '#e11d48', // Rose
+            '不明确': '#64748b'      // Slate
+        };
+
+        function initChart() {
+            const chartDom = document.getElementById('lifecycleChart');
+            // 如果容器存在再初始化
+            if (chartDom) {
+                myChart = echarts.init(chartDom);
+                
+                const series = customerData.map(item => {
+                    return {
+                        name: item.name,
+                        type: 'line',
+                        data: item.data,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        lineStyle: { width: 2.5 },
+                        itemStyle: { color: colorMap[item.type] }
+                    };
+                });
+
+                const option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        borderColor: '#e2e8f0',
+                        textStyle: { color: '#1e293b' },
+                        formatter: function (params) {
+                            let html = `<div style="font-weight:bold;margin-bottom:5px;">${params[0].axisValue}年 交易额</div>`;
+                            params.sort((a,b) => b.value - a.value); // 按金额降序排列
+                            params.forEach(p => {
+                                if(p.value > 0) { // 只显示当年有交易的客户
+                                    html += `<div style="display:flex;justify-content:space-between;gap:15px;font-size:12px;">
+                                        <span>${p.marker} 客户 ${p.seriesName}</span>
+                                        <span style="font-weight:bold;">${p.value} 万元</span>
+                                    </div>`;
+                                }
+                            });
+                            return html;
+                        }
+                    },
+                    legend: {
+                        type: 'scroll',
+                        top: 'bottom',
+                        textStyle: { fontSize: 12 }
+                    },
+                    grid: {
+                        top: '5%',
+                        left: '3%',
+                        right: '4%',
+                        bottom: '12%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: years,
+                        axisLine: { lineStyle: { color: '#94a3b8' } },
+                        axisLabel: { color: '#64748b' }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '交易额(万元)',
+                        nameTextStyle: { color: '#64748b', padding: [0, 0, 0, 20] },
+                        axisLine: { show: false },
+                        axisTick: { show: false },
+                        splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
+                        axisLabel: { color: '#64748b' }
+                    },
+                    series: series
+                };
+
+                myChart.setOption(option);
+                
+                // 监听窗口大小变化调整图表
+                window.addEventListener('resize', () => {
+                    if(myChart && !document.getElementById('view-chart').classList.contains('hidden')) {
+                        myChart.resize();
+                    }
+                });
+            }
+        }
+
+        /* ================= 3. 图表高亮过滤逻辑 ================= */
+        function filterChart(type) {
+            // 更新按钮样式
+            document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+                btn.className = 'chart-filter-btn px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition-all';
+            });
+            event.target.className = 'chart-filter-btn active px-3 py-1.5 text-xs sm:text-sm rounded-md border border-slate-300 bg-slate-800 text-white transition-all shadow-md';
+
+            // ECharts 图例控制逻辑
+            const legendState = {};
+            if (type === 'all') {
+                // 显示全部
+                customerData.forEach(item => { legendState[item.name] = true; });
+            } else {
+                // 高亮选中类型，隐藏其他类型
+                customerData.forEach(item => {
+                    legendState[item.name] = (item.type === type);
+                });
+            }
+            
+            myChart.setOption({
+                legend: { selected: legendState }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener("DOMContentLoaded", () => {
+            initChart();
+            switchTab('cover'); // 确保默认进入全屏封面页
+        });
+
+    </script>
+</body>
+</html>
