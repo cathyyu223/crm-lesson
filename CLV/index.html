@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>客户终身价值(CLV)的概念与计算方法</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* 自定义微调样式 */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .animate-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 安全区底部适配 (针对带底部黑线的手机) */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <div id="cover-view" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-64 h-64 sm:w-96 sm:h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[90px] sm:blur-[128px] opacity-40 animate-pulse"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-64 h-64 sm:w-96 sm:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-[90px] sm:blur-[128px] opacity-40 animate-pulse" style="animation-delay: 2s"></div>
+        </div>
+
+        <div class="z-10 max-w-5xl w-full space-y-8 sm:space-y-12 animate-in mt-8 sm:mt-0 mb-16 sm:mb-0">
+            <div class="text-center space-y-4 sm:space-y-6">
+                <div class="inline-flex items-center justify-center p-3 sm:p-4 bg-white/10 rounded-2xl sm:rounded-3xl backdrop-blur-md border border-white/20 mb-2 shadow-2xl">
+                    <i data-lucide="trending-up" class="w-10 h-10 sm:w-16 sm:h-16 text-blue-300"></i>
+                </div>
+                <h1 class="text-3xl sm:text-4xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg leading-tight">
+                    客户终身价值 <br class="sm:hidden" />
+                    <span class="text-blue-400 font-serif italic ml-0 sm:ml-2 text-4xl sm:text-5xl md:text-6xl">CLV</span>
+                </h1>
+                <p class="text-lg sm:text-xl md:text-2xl text-blue-100 font-light max-w-2xl mx-auto leading-relaxed px-2">
+                    概念解析与核心计算方法
+                </p>
+                <p class="text-xs sm:text-sm md:text-base text-slate-300 max-w-3xl mx-auto leading-relaxed mt-4 px-4 hidden sm:block">
+                    在大数据与精细化运营时代，量化客户资产、精准分配营销资源，是企业实现持续盈利的关键。本交互式课程将带你从理论到实战，全面掌握 CLV 的核心密码。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mt-8 sm:mt-12 px-2">
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all">
+                    <i data-lucide="book-open" class="w-6 h-6 sm:w-8 sm:h-8 text-blue-300"></i>
+                    <h3 class="text-white font-bold text-sm sm:text-lg">理论知识</h3>
+                    <p class="text-blue-100/70 text-[10px] sm:text-sm hidden sm:block">掌握基本概念与核心逻辑</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all">
+                    <i data-lucide="sigma" class="w-6 h-6 sm:w-8 sm:h-8 text-purple-300"></i>
+                    <h3 class="text-white font-bold text-sm sm:text-lg">公式解析</h3>
+                    <p class="text-blue-100/70 text-[10px] sm:text-sm hidden sm:block">深度拆解保留率与折现公式</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all">
+                    <i data-lucide="lightbulb" class="w-6 h-6 sm:w-8 sm:h-8 text-amber-300"></i>
+                    <h3 class="text-white font-bold text-sm sm:text-lg">案例对比</h3>
+                    <p class="text-blue-100/70 text-[10px] sm:text-sm hidden sm:block">静态与动态计算法的实战差异</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col items-center text-center space-y-2 sm:space-y-3 hover:bg-white/20 transition-all">
+                    <i data-lucide="calculator" class="w-6 h-6 sm:w-8 sm:h-8 text-emerald-300"></i>
+                    <h3 class="text-white font-bold text-sm sm:text-lg">专项练习</h3>
+                    <p class="text-blue-100/70 text-[10px] sm:text-sm hidden sm:block">手把手完成全套数据测算</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-8 sm:mt-16 pt-4 sm:pt-8">
+                <button onclick="switchTab('theory')" class="group relative inline-flex items-center justify-center gap-2 sm:gap-3 px-8 sm:px-10 py-4 sm:py-5 font-bold text-white bg-blue-600 rounded-full overflow-hidden shadow-xl shadow-blue-900/50 hover:bg-blue-500 transition-all hover:scale-105 active:scale-95 w-[80%] sm:w-auto">
+                    <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                    <span class="text-lg sm:text-xl relative">开启学习之旅</span>
+                    <i data-lucide="play" class="w-5 h-5 sm:w-6 sm:h-6 relative fill-current group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content-view" class="hidden min-h-screen pb-24 sm:pb-10 animate-in">
+        
+        <div class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b-2 sm:border-b-4 border-blue-600 shadow-sm px-2 sm:px-4 py-2 sm:py-3 flex flex-row items-center justify-center gap-1 sm:gap-6">
+            <div class="hidden sm:flex items-center gap-2 font-bold text-slate-700">
+                <i data-lucide="calculator" class="w-5 h-5 text-blue-600"></i>
+                <span>客户终身价值 (CLV) 综合计算公式：</span>
+            </div>
+            <div class="flex sm:hidden items-center text-xs font-bold text-blue-700 mr-1">公式:</div>
+            <div class="bg-blue-50 text-blue-800 px-2 sm:px-4 py-1 sm:py-1.5 rounded-md border border-blue-200 font-semibold text-[10px] sm:text-base flex items-center gap-1 font-serif overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <span>CLV =</span>
+                <div class="flex flex-col items-center justify-center mx-1 text-blue-700">
+                    <span class="text-[0.5rem] sm:text-[0.6rem] leading-none">n</span>
+                    <span class="text-sm sm:text-xl font-light leading-none -my-0.5 sm:-my-0.5">Σ</span>
+                    <span class="text-[0.5rem] sm:text-[0.6rem] leading-none">i=1</span>
+                </div>
+                <span>p<sub>i</sub>(b<sub>i</sub> - c<sub>i</sub>)(1 - r)<sup>i</sup> - d</span>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
+            
+            <header class="hidden sm:block text-center space-y-4">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">客户终身价值（CLV）的概念与计算方法</h1>
+            </header>
+
+            <div class="hidden sm:flex flex-wrap justify-center gap-4 border-b border-slate-200 pb-4" id="desktop-nav">
+                <button onclick="switchTab('cover')" class="nav-btn flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold transition-all bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-700">
+                    <i data-lucide="home" class="w-4 h-4"></i> <span>返回封面</span>
+                </button>
+                <button onclick="switchTab('theory')" data-tab="theory" class="nav-btn flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all">
+                    <i data-lucide="book-open" class="w-5 h-5"></i> <span>理论知识</span>
+                </button>
+                <button onclick="switchTab('formula')" data-tab="formula" class="nav-btn flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all">
+                    <i data-lucide="sigma" class="w-5 h-5"></i> <span>公式解析</span>
+                </button>
+                <button onclick="switchTab('case')" data-tab="case" class="nav-btn flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all">
+                    <i data-lucide="lightbulb" class="w-5 h-5"></i> <span>案例解析</span>
+                </button>
+                <button onclick="switchTab('exercise')" data-tab="exercise" class="nav-btn flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all">
+                    <i data-lucide="layers" class="w-5 h-5"></i> <span>专项练习</span>
+                </button>
+            </div>
+
+            <div id="section-theory" class="tab-section hidden">
+                <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in">
+                    <div class="bg-blue-600 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 text-white">
+                        <i data-lucide="book-open" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        <h2 class="text-lg sm:text-xl font-bold m-0">一、 核心概念：什么是客户终身价值？</h2>
+                    </div>
+                    <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                        <p class="text-base sm:text-lg leading-relaxed text-slate-700">
+                            <strong>客户终身价值（Customer Lifetime Value, CLV）</strong> 是指单个客户在客户生命周期内可能为企业带来的收益总和。
+                        </p>
+                        
+                        <div class="bg-slate-50 p-4 sm:p-5 rounded-lg sm:rounded-xl border border-slate-100">
+                            <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2 text-sm sm:text-base">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 sm:w-5 sm:h-5 text-green-500"></i> 核心逻辑
+                            </h3>
+                            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                                用企业在该客户身上获得的总收入，减去企业为该客户所支出的总成本后的剩余部分。<strong>CLV 越高，说明客户对企业的价值越大</strong>，企业越应该投入资源来维系关系。
+                            </p>
+                        </div>
+    
+                        <div>
+                            <h3 class="font-bold text-slate-800 mb-3 text-sm sm:text-base">构成要素：</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                                <div class="bg-blue-50/50 p-3 sm:p-4 rounded-lg border border-blue-100">
+                                    <div class="font-bold text-blue-800 mb-1 flex items-center gap-2 text-sm sm:text-base"><div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500"></div>1. 历史价值</div>
+                                    <div class="text-xs sm:text-sm text-slate-600 mt-1 sm:mt-2">到目前为止已经实现的确定收益（如客户已支付的款项）。</div>
+                                </div>
+                                <div class="bg-blue-50/50 p-3 sm:p-4 rounded-lg border border-blue-100">
+                                    <div class="font-bold text-blue-800 mb-1 flex items-center gap-2 text-sm sm:text-base"><div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400"></div>2. 当前价值</div>
+                                    <div class="text-xs sm:text-sm text-slate-600 mt-1 sm:mt-2">基于客户当前行为模式，未来将带来的预期价值（如预估的下一笔订单）。</div>
+                                </div>
+                                <div class="bg-blue-50/50 p-3 sm:p-4 rounded-lg border border-blue-100">
+                                    <div class="font-bold text-blue-800 mb-1 flex items-center gap-2 text-sm sm:text-base"><div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-300"></div>3. 潜在价值</div>
+                                    <div class="text-xs sm:text-sm text-slate-600 mt-1 sm:mt-2">客户可能交叉购买或推荐新客户产生的价值（需要企业主动引导）。</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="section-formula" class="tab-section hidden">
+                <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in">
+                    <div class="bg-purple-600 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 text-white">
+                        <i data-lucide="sigma" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        <h2 class="text-lg sm:text-xl font-bold m-0">二、 核心公式：CLV计算模型详解</h2>
+                    </div>
+                    <div class="p-4 sm:p-6 space-y-6 sm:space-y-8">
+                        
+                        <div class="text-center space-y-4">
+                            <p class="text-sm sm:text-base text-slate-600">综合来看，客户终身价值的计算公式如下：</p>
+                            <div class="bg-slate-50 border-2 border-purple-200 rounded-lg sm:rounded-xl p-4 sm:p-6 shadow-inner inline-block w-full sm:w-auto overflow-x-auto">
+                                <div class="flex items-center justify-center gap-1 sm:gap-2 text-lg sm:text-2xl text-purple-900 font-bold font-serif whitespace-nowrap">
+                                    <span>CLV =</span>
+                                    <div class="flex flex-col items-center justify-center mx-1 sm:mx-2 text-purple-800">
+                                        <span class="text-[10px] sm:text-xs">n</span>
+                                        <span class="text-3xl sm:text-4xl font-light leading-none -my-1">Σ</span>
+                                        <span class="text-[10px] sm:text-xs">i=1</span>
+                                    </div>
+                                    <span>p<sub>i</sub>(b<sub>i</sub> - c<sub>i</sub>)(1 - r)<sup>i</sup> - d</span>
+                                </div>
+                                
+                                <div class="mt-4 sm:mt-6 pt-4 sm:pt-5 border-t border-purple-200 text-left sm:text-center min-w-max">
+                                    <div class="text-xs sm:text-sm text-purple-600 mb-2 sm:mb-3 font-bold flex items-center justify-center gap-1 sm:gap-2">
+                                        <i data-lucide="info" class="w-3 h-3 sm:w-4 sm:h-4"></i> 中文语义对照公式
+                                    </div>
+                                    <div class="flex items-center justify-center flex-nowrap gap-1 sm:gap-2 text-xs sm:text-sm text-slate-700 font-medium">
+                                        <span class="bg-white px-1 sm:px-2 py-1 sm:py-1.5 rounded border border-slate-200 shadow-sm text-purple-800 font-bold">客户终身价值</span>
+                                        <span>=</span>
+                                        <div class="flex flex-col items-center justify-center text-purple-700">
+                                            <span class="text-[0.5rem] sm:text-[0.6rem] leading-none">生命周期内</span>
+                                            <span class="text-xl sm:text-2xl font-light leading-none">Σ</span>
+                                            <span class="text-[0.5rem] sm:text-[0.6rem] leading-none">逐年累加</span>
+                                        </div>
+                                        <span class="text-slate-400 text-sm sm:text-lg">[</span>
+                                        <span class="bg-white px-1 sm:px-2 py-1 sm:py-1.5 rounded border border-slate-200 shadow-sm text-indigo-700">保留率</span>
+                                        <span class="text-slate-400">×</span>
+                                        <span class="bg-white px-1 sm:px-2 py-1 sm:py-1.5 rounded border border-slate-200 shadow-sm text-emerald-700">(当年收入 - 保留成本)</span>
+                                        <span class="text-slate-400">×</span>
+                                        <span class="bg-white px-1 sm:px-2 py-1 sm:py-1.5 rounded border border-slate-200 shadow-sm text-amber-700">折现系数</span>
+                                        <span class="text-slate-400 text-sm sm:text-lg">]</span>
+                                        <span>-</span>
+                                        <span class="bg-white px-1 sm:px-2 py-1 sm:py-1.5 rounded border border-slate-200 shadow-sm text-rose-600">获取成本</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="bg-white border border-slate-200 rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+                            <div class="bg-slate-50 px-4 sm:px-6 py-2 sm:py-3 border-b border-slate-200">
+                                <h3 class="font-bold text-sm sm:text-base text-slate-800">公式参数说明</h3>
+                            </div>
+                            <div class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 sm:gap-y-4 text-sm sm:text-base">
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">CLV</span>
+                                    <p class="text-slate-700">代表<strong class="text-slate-900">客户终身价值</strong></p>
+                                </div>
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">i</span>
+                                    <p class="text-slate-700">为<strong class="text-slate-900">时间</strong>（第几年）</p>
+                                </div>
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">b<sub>i</sub></span>
+                                    <p class="text-slate-700">为在 i 时内来自客户的<strong class="text-slate-900">收入</strong></p>
+                                </div>
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">c<sub>i</sub></span>
+                                    <p class="text-slate-700">为在 i 时内<strong class="text-slate-900">保留客户的成本</strong></p>
+                                </div>
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">p<sub>i</sub></span>
+                                    <p class="text-slate-700">为在 i 时的<strong class="text-slate-900">客户保留率</strong></p>
+                                </div>
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">r</span>
+                                    <p class="text-slate-700">为<strong class="text-slate-900">贴现率</strong></p>
+                                </div>
+                                <div class="flex items-start gap-2 sm:gap-3">
+                                    <span class="font-mono font-bold text-purple-700 bg-purple-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded min-w-[2.5rem] sm:min-w-[3rem] text-center">d</span>
+                                    <p class="text-slate-700">为<strong class="text-slate-900">获取客户的成本</strong></p>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="bg-purple-50 border-l-4 border-purple-500 p-4 sm:p-5 rounded-r-lg sm:rounded-r-xl">
+                            <h3 class="font-bold text-purple-800 mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+                                <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5"></i> 逻辑拆解：这个公式是怎么工作的？
+                            </h3>
+                            <ul class="space-y-2 sm:space-y-3 text-xs sm:text-sm text-purple-900 leading-relaxed">
+                                <li><strong class="font-mono bg-white px-1 border border-purple-200 rounded text-xs">(b<sub>i</sub> - c<sub>i</sub>)</strong>：首先计算出第 i 年产生的<strong>净收益</strong>。</li>
+                                <li><strong class="font-mono bg-white px-1 border border-purple-200 rounded text-xs">p<sub>i</sub> × 净收益</strong>：乘以客户留存的概率（不确定性），得到<strong>期望收益</strong>。</li>
+                                <li><strong class="font-mono bg-white px-1 border border-purple-200 rounded text-xs">期望收益 × (1 - r)<sup>i</sup></strong>：利用贴现率，将未来的期望收益折算成<strong>当前的价值</strong>。</li>
+                                <li><strong class="font-mono bg-white px-1 border border-purple-200 rounded text-xs">Σ (求和)</strong>：将生命周期内所有年份的折现后收益加总起来。</li>
+                                <li><strong class="font-mono bg-white px-1 border border-purple-200 rounded text-xs">- d</strong>：最后，扣除最初的<strong>一次性拉新成本</strong>，得到净终身价值。</li>
+                            </ul>
+                        </div>
+    
+                    </div>
+                </section>
+            </div>
+
+            <div id="section-case" class="tab-section hidden">
+                <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in">
+                    <div class="bg-indigo-600 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 text-white">
+                        <i data-lucide="lightbulb" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        <h2 class="text-lg sm:text-xl font-bold m-0">三、 案例解析：两种计算形式对比</h2>
+                    </div>
+                    
+                    <div class="p-4 sm:p-6 space-y-6 sm:space-y-8">
+                        <div class="space-y-3 sm:space-y-4 w-full">
+                            <h3 class="font-bold text-base sm:text-lg text-slate-800">【案例题目】</h3>
+                            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                                假设某客户的历年财务数据如下表所示。在商业实践中，2024年及以后的数据为企业预估。若考虑该客户未来行为的不确定性（假设2024年保留率为78%，2025年保留率为60%），并设定企业的<strong>贴现率为 14%</strong>，请对比两种情况下的计算逻辑。
+                            </p>
+                            
+                            <p class="text-xs text-indigo-500 sm:hidden flex items-center gap-1 mt-2">
+                                <i data-lucide="hand" class="w-3 h-3"></i> 左右滑动查看完整表格
+                            </p>
+            
+                            <div class="overflow-x-auto bg-white border border-slate-200 rounded-lg shadow-sm scrollbar-hide">
+                                <table class="w-full text-xs sm:text-sm text-center whitespace-nowrap">
+                                    <thead class="bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th class="p-2 sm:p-3 font-semibold text-slate-700 border-r border-slate-200 sticky left-0 bg-slate-50 shadow-[1px_0_0_0_#e2e8f0] z-10">年份</th>
+                                            <th class="p-2 sm:p-3">2019</th>
+                                            <th class="p-2 sm:p-3">2020</th>
+                                            <th class="p-2 sm:p-3">2021</th>
+                                            <th class="p-2 sm:p-3">2022</th>
+                                            <th class="p-2 sm:p-3">2023</th>
+                                            <th class="p-2 sm:p-3 bg-indigo-50/50">2024(预估)</th>
+                                            <th class="p-2 sm:p-3 bg-indigo-50/50">2025(预估)</th>
+                                            <th class="p-2 sm:p-3 bg-indigo-50/50">2026(预估)</th>
+                                            <th class="p-2 sm:p-3 bg-indigo-50/50">2027(预估)</th>
+                                            <th class="p-2 sm:p-3 bg-indigo-50/50">2028(预估)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 text-slate-600">
+                                        <tr>
+                                            <td class="p-2 sm:p-3 font-medium border-r border-slate-200 bg-white sticky left-0 shadow-[1px_0_0_0_#e2e8f0] z-10">来自客户的收入/元</td>
+                                            <td class="p-2 sm:p-3">10000</td>
+                                            <td class="p-2 sm:p-3">12000</td>
+                                            <td class="p-2 sm:p-3">14500</td>
+                                            <td class="p-2 sm:p-3">15000</td>
+                                            <td class="p-2 sm:p-3">15000</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">15000</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">15500</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">16000</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">16000</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">16000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 sm:p-3 font-medium border-r border-slate-200 bg-white sticky left-0 shadow-[1px_0_0_0_#e2e8f0] z-10">保留客户的成本/元</td>
+                                            <td class="p-2 sm:p-3">4000</td>
+                                            <td class="p-2 sm:p-3">3500</td>
+                                            <td class="p-2 sm:p-3">3200</td>
+                                            <td class="p-2 sm:p-3">3000</td>
+                                            <td class="p-2 sm:p-3">2700</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">2500</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">2500</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">2500</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">2500</td>
+                                            <td class="p-2 sm:p-3 bg-indigo-50/30">2500</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 sm:p-3 font-medium border-r border-slate-200 bg-white sticky left-0 shadow-[1px_0_0_0_#e2e8f0] z-10">获取客户的成本/元</td>
+                                            <td colspan="10" class="p-2 sm:p-3 font-semibold text-slate-700 bg-slate-50">5000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+            
+                        <div class="border border-slate-200 rounded-lg sm:rounded-xl overflow-hidden">
+                            <button onclick="toggleAccordion('formA', this)" class="w-full bg-slate-50 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between hover:bg-slate-100 transition-colors">
+                                <span class="font-bold text-sm sm:text-base text-slate-800 text-left">形式 A：不考虑不确定性和贴现率（基础静态法）</span>
+                                <i data-lucide="chevron-down" class="acc-icon text-slate-500 w-5 h-5 flex-shrink-0 transition-transform"></i>
+                            </button>
+                            <div id="formA" class="hidden p-4 sm:p-5 border-t border-slate-200 bg-white space-y-3 text-sm sm:text-base">
+                                <p><strong>解答过程：</strong>直接将历年来来自客户的总收入（145,000元）减去获取与保留的总成本（历年保留成本28,900元 + 获取成本5,000元 = 33,900元）。</p>
+                                <div class="bg-slate-50 p-3 sm:p-4 rounded-lg font-mono text-center text-base sm:text-lg text-indigo-700">
+                                    CLV = 145,000 - 33,900 = <strong>111,100 元</strong>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-500">
+                                    <strong>解析：</strong>这种方法简单直观，但假设了客户会绝对忠诚且资金不会随时间贬值，计算结果往往偏向理想化。
+                                </p>
+                            </div>
+                        </div>
+            
+                        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 sm:p-5 rounded-r-lg sm:rounded-r-xl">
+                            <h3 class="font-bold text-amber-800 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+                                <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5"></i> 为什么需要“不确定性”与“贴现率”？
+                            </h3>
+                            <ul class="space-y-2 text-xs sm:text-sm text-amber-900 list-disc pl-4 sm:pl-5">
+                                <li><strong>考虑不确定性（保留率 p<sub>i</sub>）：</strong>客户随时可能流失。预估的收入必须乘以客户留存的概率。</li>
+                                <li><strong>考虑时间价值（贴现率 r）：</strong>未来收到的货币，其价值比当前拥有的低。贴现率用于计算未来收入在当前价值的折扣。</li>
+                            </ul>
+                        </div>
+            
+                        <div class="border border-slate-200 rounded-lg sm:rounded-xl overflow-hidden">
+                            <button onclick="toggleAccordion('formB', this)" class="w-full bg-slate-50 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between hover:bg-slate-100 transition-colors">
+                                <span class="font-bold text-sm sm:text-base text-slate-800 text-left">形式 B：考虑不确定性和贴现率（综合动态法）</span>
+                                <i data-lucide="chevron-down" class="acc-icon text-slate-500 w-5 h-5 flex-shrink-0 transition-transform"></i>
+                            </button>
+                            <div id="formB" class="hidden p-4 sm:p-5 border-t border-slate-200 bg-white space-y-3 sm:space-y-4">
+                                <p class="text-sm sm:text-base text-slate-600"><strong>解答过程（逻辑演示）：</strong>由于企业无法确定生命周期长度，需以整体保留率逐年测算并折现（以 14% 贴现率为例）：</p>
+                                <ul class="space-y-2 bg-slate-50 p-3 sm:p-4 rounded-lg font-mono text-xs sm:text-sm overflow-x-auto">
+                                    <li class="whitespace-nowrap">2024年折现示例：15,000 × 78% × (1 - 14%)^1 = 10,062 元</li>
+                                    <li class="whitespace-nowrap">2025年折现示例：15,500 × 60% × (1 - 14%)^2 ≈ 6,878.28 元</li>
+                                </ul>
+                                <p class="text-xs sm:text-sm text-slate-500">
+                                    以此类推，将所有年份的折现净收益相加，最后减去初始获取成本即可得出 CLV。<br/>
+                                    <em class="text-[10px] sm:text-xs text-slate-400">(注：本案例重在展示动态测算逻辑，因未提供完整概率，不作最终计算)</em>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="section-exercise" class="tab-section hidden">
+                <section class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in">
+                    <div class="bg-emerald-600 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sm:gap-3 text-white">
+                        <i data-lucide="layers" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        <h2 class="text-lg sm:text-xl font-bold m-0">四、 专项练习：CLV 详细计算实战</h2>
+                    </div>
+        
+                    <div class="p-4 sm:p-6 space-y-6 sm:space-y-8">
+                        <div class="space-y-3 sm:space-y-4 w-full">
+                            <h3 class="font-bold text-base sm:text-lg text-slate-800">【练习题题目】</h3>
+                            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                                某企业获取客户 A 的成本为 <strong>5,000 元</strong>，设定的贴现率为 <strong>20%</strong>。经预测，客户 A 在 2024 年至 2028 年的财务数据如下表所示。要求：详细计算该客户每年的折现利润，并求出最终的 CLV。
+                            </p>
+                            
+                            <p class="text-xs text-emerald-500 sm:hidden flex items-center gap-1 mt-2">
+                                <i data-lucide="hand" class="w-3 h-3"></i> 左右滑动查看完整表格
+                            </p>
+        
+                            <div class="overflow-x-auto bg-white border border-slate-200 rounded-lg shadow-sm scrollbar-hide">
+                                <table class="w-full text-xs sm:text-sm text-center whitespace-nowrap">
+                                    <thead class="bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th class="p-2 sm:p-3 font-semibold text-slate-700 border-r border-slate-200 sticky left-0 bg-slate-50 shadow-[1px_0_0_0_#e2e8f0] z-10">年份</th>
+                                            <th class="p-2 sm:p-3">2024</th>
+                                            <th class="p-2 sm:p-3">2025</th>
+                                            <th class="p-2 sm:p-3">2026</th>
+                                            <th class="p-2 sm:p-3">2027</th>
+                                            <th class="p-2 sm:p-3">2028</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 text-slate-600">
+                                        <tr>
+                                            <td class="p-2 sm:p-3 font-medium border-r border-slate-200 bg-white sticky left-0 shadow-[1px_0_0_0_#e2e8f0] z-10">客户保留率</td>
+                                            <td class="p-2 sm:p-3">100%</td>
+                                            <td class="p-2 sm:p-3">80%</td>
+                                            <td class="p-2 sm:p-3">72%</td>
+                                            <td class="p-2 sm:p-3">66%</td>
+                                            <td class="p-2 sm:p-3">60%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 sm:p-3 font-medium border-r border-slate-200 bg-white sticky left-0 shadow-[1px_0_0_0_#e2e8f0] z-10">来自客户的收入/元</td>
+                                            <td class="p-2 sm:p-3">10000</td>
+                                            <td class="p-2 sm:p-3">15000</td>
+                                            <td class="p-2 sm:p-3">20000</td>
+                                            <td class="p-2 sm:p-3">22000</td>
+                                            <td class="p-2 sm:p-3">22000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 sm:p-3 font-medium border-r border-slate-200 bg-white sticky left-0 shadow-[1px_0_0_0_#e2e8f0] z-10">保留客户的成本/元</td>
+                                            <td class="p-2 sm:p-3">3000</td>
+                                            <td class="p-2 sm:p-3">2000</td>
+                                            <td class="p-2 sm:p-3">1500</td>
+                                            <td class="p-2 sm:p-3">1200</td>
+                                            <td class="p-2 sm:p-3">1200</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" class="p-2 sm:p-3 text-left sm:text-center font-medium border-t border-slate-200 bg-slate-50 text-xs sm:text-sm">
+                                                <span class="inline-block mr-4">贴现率：20%</span>
+                                                <span class="inline-block">获取客户的成本：5000元</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+        
+                        <div class="text-center pt-2 sm:pt-4">
+                            <button id="btn-exercise-toggle" onclick="toggleExercise()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 sm:py-3 px-6 sm:px-8 rounded-full shadow-md transition-all transform hover:scale-105 text-sm sm:text-base">
+                                点击查看详细解答步骤
+                            </button>
+                        </div>
+        
+                        <div id="exercise-answer" class="hidden space-y-4 sm:space-y-6 pt-4 border-t border-slate-200 animate-in">
+                            <div class="bg-emerald-50 border border-emerald-200 p-3 sm:p-4 rounded-lg overflow-x-auto scrollbar-hide">
+                                <div class="flex items-center flex-nowrap gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-700 font-medium min-w-max">
+                                    <span class="bg-white px-2 py-1.5 rounded border border-slate-200 shadow-sm text-emerald-800 font-bold">当年折现后利润</span>
+                                    <span>=</span>
+                                    <span class="bg-white px-2 py-1.5 rounded border border-slate-200 shadow-sm text-indigo-700">保留率</span>
+                                    <span class="text-slate-400">×</span>
+                                    <span class="bg-white px-2 py-1.5 rounded border border-slate-200 shadow-sm text-emerald-700">(当年收入 - 保留成本)</span>
+                                    <span class="text-slate-400">×</span>
+                                    <span class="bg-white px-2 py-1.5 rounded border border-slate-200 shadow-sm text-amber-700">折现系数 (1-20%)<sup>i</sup></span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xs text-emerald-500 sm:hidden flex items-center gap-1 -mb-2">
+                                <i data-lucide="hand" class="w-3 h-3"></i> 左右滑动查看步骤明细
+                            </p>
+        
+                            <div class="overflow-x-auto shadow-sm border border-slate-200 rounded-lg scrollbar-hide">
+                                <table class="w-full border-collapse text-xs sm:text-sm whitespace-nowrap">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b border-slate-300 text-slate-700">
+                                            <th class="p-2 sm:p-3 text-left sticky left-0 bg-slate-100 shadow-[1px_0_0_0_#cbd5e1] z-10">年份(i)</th>
+                                            <th class="p-2 sm:p-3 text-left">理论利润</th>
+                                            <th class="p-2 sm:p-3 text-center">保留率</th>
+                                            <th class="p-2 sm:p-3 text-left">预期收益</th>
+                                            <th class="p-2 sm:p-3 text-left">折现系数</th>
+                                            <th class="p-2 sm:p-3 text-right">折现后利润</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 text-slate-600 bg-white">
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 sm:p-3 font-semibold text-slate-800 sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">2024(1)</td>
+                                            <td class="p-2 sm:p-3">10000 - 3000 = 7000</td>
+                                            <td class="p-2 sm:p-3 text-center">1.00</td>
+                                            <td class="p-2 sm:p-3">7000</td>
+                                            <td class="p-2 sm:p-3 font-mono text-[10px] sm:text-xs text-slate-400">0.8<sup>1</sup></td>
+                                            <td class="p-2 sm:p-3 text-right font-bold text-emerald-700">5,600.00</td>
+                                        </tr>
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 sm:p-3 font-semibold text-slate-800 sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">2025(2)</td>
+                                            <td class="p-2 sm:p-3">15000 - 2000 = 13000</td>
+                                            <td class="p-2 sm:p-3 text-center">0.80</td>
+                                            <td class="p-2 sm:p-3">10400</td>
+                                            <td class="p-2 sm:p-3 font-mono text-[10px] sm:text-xs text-slate-400">0.8<sup>2</sup>=0.64</td>
+                                            <td class="p-2 sm:p-3 text-right font-bold text-emerald-700">6,656.00</td>
+                                        </tr>
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 sm:p-3 font-semibold text-slate-800 sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">2026(3)</td>
+                                            <td class="p-2 sm:p-3">20000 - 1500 = 18500</td>
+                                            <td class="p-2 sm:p-3 text-center">0.72</td>
+                                            <td class="p-2 sm:p-3">13320</td>
+                                            <td class="p-2 sm:p-3 font-mono text-[10px] sm:text-xs text-slate-400">0.8<sup>3</sup>=0.512</td>
+                                            <td class="p-2 sm:p-3 text-right font-bold text-emerald-700">6,819.84</td>
+                                        </tr>
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 sm:p-3 font-semibold text-slate-800 sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">2027(4)</td>
+                                            <td class="p-2 sm:p-3">22000 - 1200 = 20800</td>
+                                            <td class="p-2 sm:p-3 text-center">0.66</td>
+                                            <td class="p-2 sm:p-3">13728</td>
+                                            <td class="p-2 sm:p-3 font-mono text-[10px] sm:text-xs text-slate-400">0.8<sup>4</sup>=0.4096</td>
+                                            <td class="p-2 sm:p-3 text-right font-bold text-emerald-700">5,622.99</td>
+                                        </tr>
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 sm:p-3 font-semibold text-slate-800 sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10">2028(5)</td>
+                                            <td class="p-2 sm:p-3">22000 - 1200 = 20800</td>
+                                            <td class="p-2 sm:p-3 text-center">0.60</td>
+                                            <td class="p-2 sm:p-3">12480</td>
+                                            <td class="p-2 sm:p-3 font-mono text-[10px] sm:text-xs text-slate-400">0.8<sup>5</sup>=0.32768</td>
+                                            <td class="p-2 sm:p-3 text-right font-bold text-emerald-700">4,089.45</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+        
+                            <div class="bg-slate-800 text-white p-4 sm:p-6 rounded-lg sm:rounded-xl space-y-3 sm:space-y-4 shadow-lg">
+                                <h3 class="text-base sm:text-lg font-bold border-b border-slate-600 pb-2">最终汇总</h3>
+                                
+                                <div class="space-y-1">
+                                    <p class="text-slate-300 text-xs sm:text-sm">1. 实际利润（5年总折现值）：</p>
+                                    <p class="font-mono bg-slate-900 p-2 sm:p-3 rounded flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 text-[10px] sm:text-sm">
+                                        <span class="break-all whitespace-normal">5600 + 6656 + 6819.84 + 5622.99 + 4089.45 = </span>
+                                        <span class="text-emerald-400 font-bold text-sm sm:text-lg">28,788.28 元</span>
+                                    </p>
+                                </div>
+        
+                                <div class="space-y-1">
+                                    <p class="text-slate-300 text-xs sm:text-sm">2. 客户终身价值 (CLV)：</p>
+                                    <p class="font-mono bg-slate-900 p-2 sm:p-3 rounded flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                                        <span>28,788.28 - 5,000 (获取成本) = </span>
+                                        <span class="text-yellow-400 font-bold text-base sm:text-xl">23,788.28 元</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="mobile-nav" class="hidden sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 z-50 justify-around items-center px-1 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('cover')" data-tab="cover" class="mobile-nav-btn flex flex-col items-center justify-center w-1/5 py-2 text-slate-400">
+            <i data-lucide="home" class="w-5 h-5 mb-1 transition-colors"></i>
+            <span class="text-[10px] font-medium">首页</span>
+        </button>
+        <button onclick="switchTab('theory')" data-tab="theory" class="mobile-nav-btn flex flex-col items-center justify-center w-1/5 py-2 text-slate-400">
+            <i data-lucide="book-open" class="w-5 h-5 mb-1 transition-colors"></i>
+            <span class="text-[10px] font-medium">理论</span>
+        </button>
+        <button onclick="switchTab('formula')" data-tab="formula" class="mobile-nav-btn flex flex-col items-center justify-center w-1/5 py-2 text-slate-400">
+            <i data-lucide="sigma" class="w-5 h-5 mb-1 transition-colors"></i>
+            <span class="text-[10px] font-medium">公式</span>
+        </button>
+        <button onclick="switchTab('case')" data-tab="case" class="mobile-nav-btn flex flex-col items-center justify-center w-1/5 py-2 text-slate-400">
+            <i data-lucide="lightbulb" class="w-5 h-5 mb-1 transition-colors"></i>
+            <span class="text-[10px] font-medium">案例</span>
+        </button>
+        <button onclick="switchTab('exercise')" data-tab="exercise" class="mobile-nav-btn flex flex-col items-center justify-center w-1/5 py-2 text-slate-400">
+            <i data-lucide="layers" class="w-5 h-5 mb-1 transition-colors"></i>
+            <span class="text-[10px] font-medium">实战</span>
+        </button>
+    </div>
+
+    <script>
+        // 初始化 Lucide Icons
+        lucide.createIcons();
+
+        // 颜色映射用于激活状态
+        const tabColors = {
+            'cover': 'text-blue-600',
+            'theory': 'text-blue-600',
+            'formula': 'text-purple-600',
+            'case': 'text-indigo-600',
+            'exercise': 'text-emerald-600'
+        };
+
+        const bgColors = {
+            'theory': 'bg-blue-600',
+            'formula': 'bg-purple-600',
+            'case': 'bg-indigo-600',
+            'exercise': 'bg-emerald-600'
+        };
+
+        const fillColors = {
+            'cover': 'fill-blue-100',
+            'theory': 'fill-blue-100',
+            'formula': 'fill-purple-100',
+            'case': 'fill-indigo-100',
+            'exercise': 'fill-emerald-100'
+        };
+
+        // 切换导航标签页
+        function switchTab(tabId) {
+            const isCover = tabId === 'cover';
+
+            // 1. 切换大视图 (封面 vs 内容区)
+            if (isCover) {
+                document.getElementById('cover-view').classList.remove('hidden');
+                document.getElementById('main-content-view').classList.add('hidden');
+                document.getElementById('mobile-nav').classList.remove('flex');
+                document.getElementById('mobile-nav').classList.add('hidden');
+            } else {
+                document.getElementById('cover-view').classList.add('hidden');
+                document.getElementById('main-content-view').classList.remove('hidden');
+                document.getElementById('mobile-nav').classList.remove('hidden');
+                document.getElementById('mobile-nav').classList.add('flex');
+                
+                // 隐藏所有内容段落
+                document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+                // 显示选中的内容段落
+                document.getElementById('section-' + tabId).classList.remove('hidden');
+            }
+
+            // 2. 更新 PC 端顶部导航按钮状态
+            document.querySelectorAll('#desktop-nav .nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.className = `nav-btn flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all text-white shadow-md transform scale-105 ${bgColors[tabId]}`;
+                } else {
+                    btn.className = 'nav-btn flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-700';
+                }
+            });
+
+            // 3. 更新移动端底部导航按钮状态
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                const target = btn.getAttribute('data-tab');
+                const icon = btn.querySelector('svg');
+                
+                // 重置类名
+                btn.className = `mobile-nav-btn flex flex-col items-center justify-center w-1/5 py-2 ${target === tabId ? tabColors[target] : 'text-slate-400'}`;
+                
+                // 设置图标填充色
+                if (target === tabId) {
+                    const fillClass = fillColors[target];
+                    icon.classList.add(...fillClass.split(' ')); // 支持多类名
+                    icon.style.fill = 'currentColor';
+                    icon.style.fillOpacity = '0.2';
+                } else {
+                    icon.style.fill = 'none';
+                }
+            });
+
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 切换案例解析中的折叠面板
+        function toggleAccordion(id, btnElement) {
+            const content = document.getElementById(id);
+            const icon = btnElement.querySelector('.acc-icon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                // 旋转箭头
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // 切换实战练习答案区
+        function toggleExercise() {
+            const answerSection = document.getElementById('exercise-answer');
+            const btn = document.getElementById('btn-exercise-toggle');
+            
+            if (answerSection.classList.contains('hidden')) {
+                answerSection.classList.remove('hidden');
+                btn.innerText = "收起详细解答步骤";
+            } else {
+                answerSection.classList.add('hidden');
+                btn.innerText = "点击查看详细解答步骤";
+            }
+        }
+        
+        // 初始高亮首页图标
+        document.addEventListener("DOMContentLoaded", () => {
+            switchTab('cover');
+        });
+    </script>
+</body>
+</html>
