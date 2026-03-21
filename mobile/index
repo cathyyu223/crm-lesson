@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM 课程互动资源门户</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: #f1f5f9; }
+        .course-card:active { transform: scale(0.96); transition: all 0.2s; }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <div class="max-w-md mx-auto space-y-8">
+        <!-- 头部 -->
+        <header class="text-center space-y-4 py-6">
+            <div class="inline-block p-4 bg-slate-900 rounded-[2rem] shadow-xl mb-2">
+                <i class="fa-solid fa- Chalkboard-user text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-black text-slate-800 tracking-tight">CRM 互动课堂</h1>
+            <p class="text-slate-500 font-medium">请点击下方链接进入对应的互动课件</p>
+        </header>
+
+        <!-- 课件列表 -->
+        <div class="space-y-4">
+            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-2 flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                资源列表
+            </h2>
+            
+            <!-- 课件项 1 -->
+            <a href="./lesson1/" class="course-card block bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200 flex items-center justify-between group">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 text-2xl">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-slate-800 text-lg">客户生命周期模式</h3>
+                        <p class="text-sm text-slate-400">第一章 核心理论解析</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-blue-500"></i>
+            </a>
+
+            <!-- 课件项 2 (示例) -->
+            <a href="./lesson2/" class="course-card block bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200 flex items-center justify-between group opacity-50">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 text-2xl">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-slate-800 text-lg">客户价值细分</h3>
+                        <p class="text-sm text-slate-400">资源建设中...</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center pt-12 text-slate-400 text-[10px] tracking-widest">
+            <p>© 2026 CRM 课程教学组</p>
+            <p class="mt-1">GITHUB PAGES 托管</p>
+        </footer>
+    </div>
+</body>
+</html>
