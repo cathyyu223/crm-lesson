@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户生命周期模式 - 手机互动版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: #f8fafc; }
+        .hidden-view { display: none !important; }
+        .animate-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .nav-active { background-color: white !important; border-color: currentColor !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="antialiased text-slate-900 overflow-x-hidden">
+
+    <!-- 封面 -->
+    <div id="cover-view" class="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
+        <div class="max-w-md w-full space-y-8 animate-in">
+            <div class="space-y-4">
+                <span class="px-4 py-1.5 bg-blue-600 text-white text-xs font-black rounded-full tracking-widest uppercase inline-block">CRM 核心理论互动</span>
+                <h1 class="text-white font-black text-4xl tracking-tight">客户生命周期<br><span class="text-blue-500">模式深度解析</span></h1>
+            </div>
+            <div class="flex flex-col gap-4 pt-6">
+                <button onclick="switchView('teaching')" class="w-full py-5 bg-white text-slate-900 text-xl font-black rounded-2xl shadow-xl"><i class="fa-solid fa-play mr-2"></i> 开始学习</button>
+                <button onclick="startQuiz()" class="w-full py-5 bg-indigo-600 text-white text-xl font-black rounded-2xl shadow-xl"><i class="fa-solid fa-graduation-cap mr-2"></i> 实战练习</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教学 -->
+    <div id="teaching-view" class="hidden-view min-h-screen flex flex-col animate-in">
+        <header class="bg-white border-b p-4 sticky top-0 z-20 flex justify-between items-center">
+            <h2 class="font-black text-lg text-slate-800">模式分析</h2>
+            <button onclick="switchView('cover')" class="text-sm font-bold text-slate-400">返回封面</button>
+        </header>
+        <nav class="bg-slate-100 p-2 flex gap-2 overflow-x-auto no-scrollbar sticky top-[61px] z-10" id="mobile-nav"></nav>
+        <main class="flex-grow p-4 space-y-4 max-w-lg mx-auto w-full pb-32">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6">
+                <div class="flex justify-between items-start">
+                    <div><h3 id="display-title" class="text-3xl font-black mb-1 text-blue-600">标题</h3><p id="display-subtitle" class="text-xs font-black text-slate-300 tracking-widest uppercase">副标题</p></div>
+                    <div id="display-icon-box" class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-xl"></div>
+                </div>
+                <div class="h-48 bg-slate-50 rounded-2xl border border-slate-100 p-2 overflow-hidden" id="svg-container"></div>
+                <p id="display-desc" class="text-slate-600 text-sm leading-relaxed font-medium"></p>
+                <ul id="display-reasons" class="space-y-3 text-sm"></ul>
+            </div>
+            <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-lg border-l-8 border-blue-500">
+                <div class="text-[10px] font-black text-slate-500 mb-2 uppercase">管理启示</div>
+                <p id="display-insight" class="text-base font-bold italic text-blue-300"></p>
+            </div>
+        </main>
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-100 to-transparent">
+            <button onclick="startQuiz()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-2xl">进入练习</button>
+        </div>
+    </div>
+
+    <!-- 练习 (修正了 ID 问题) -->
+    <div id="quiz-view" class="hidden-view min-h-screen p-4 flex flex-col animate-in">
+        <header class="p-2 flex justify-between items-center mb-4">
+            <h2 id="quiz-progress" class="font-black text-indigo-900">实战挑战</h2>
+            <button onclick="switchView('cover')" class="text-sm font-bold text-slate-400">退出</button>
+        </header>
+        <div class="max-w-md mx-auto w-full space-y-6">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border-l-[12px] border-indigo-600">
+                <p id="quiz-scenario" class="text-lg font-black text-slate-800 leading-snug"></p>
+            </div>
+            <div class="grid grid-cols-1 gap-3" id="quiz-options"></div>
+            <div id="quiz-feedback" class="hidden-view bg-slate-900 text-white rounded-3xl p-6 space-y-4 animate-in">
+                <h3 id="feedback-title" class="text-xl font-black">结果</h3>
+                <p id="feedback-explain" class="text-sm text-slate-400 leading-relaxed"></p>
+                <button onclick="nextQuizQuestion()" class="w-full py-4 bg-white text-slate-900 rounded-xl font-black">下一题</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const patternsData = {
+            miscarriage: { id: 'miscarriage', title: "早期“流产”型", subtitle: "未能越过开发期", roman: 'I', navClass: "text-rose-600", desc: "关系非常脆弱，在相互了解的初级阶段就告吹了。", reasons: ["承诺与现实差距大", "信任疑虑", "价值评估低"], insight: "说明企业建立初始关系的能力有待提升。", svgPath: "M 50,180 Q 150,50 180,200", icon: "fa-solid fa-heart-crack", stroke: "#e11d48" },
+            death: { id: 'death', title: "中途“夭折”型", subtitle: "成长期中断", roman: 'II', navClass: "text-orange-600", desc: "建立了初步信任，但没能进入稳定的成熟期。", reasons: ["产品迭代跟不上", "竞争对手吸引", "服务资源断档"], insight: "必须不断提升价值，超越对手预期。", svgPath: "M 50,180 Q 100,120 150,100 T 250,50 L 280,200", icon: "fa-solid fa-bolt", stroke: "#ea580c" },
+            earlyExit: { id: 'earlyExit', title: "提前退出型", subtitle: "成熟期内流失", roman: 'III', navClass: "text-amber-600", desc: "进入了成熟期但没能长期存续。", reasons: ["增值服务不足", "收益不对等感", "响应变化迟缓"], insight: "稳定关系非永恒，需持续提供增值。", svgPath: "M 50,180 Q 100,120 150,100 T 250,50 H 350 L 380,200", icon: "fa-solid fa-door-open", stroke: "#d97706" },
+            longTerm: { id: 'longTerm', title: "长久保持型", subtitle: "理想周期模式", roman: 'IV', navClass: "text-emerald-600", desc: "关系长久保持在成熟期，利润丰厚。", reasons: ["双赢高度契合", "高转移成本", "深度合作伙伴"], insight: "反映了客户群体的最高质量。", svgPath: "M 50,180 Q 100,120 150,100 T 250,50 H 550 Q 580,50 580,200", icon: "fa-solid fa-gem", stroke: "#059669" }
+        };
+        const rawQuizzes = [
+            { scenario: "70% 的新用户在注册后从未下单即卸载。这属于？", options: ["早期“流产”型", "中途“夭折”型", "提前退出型", "长久保持型"], correctIdx: 0, explain: "用户仅停留在‘开发期’即终止关系。" },
+            { scenario: "张先生发现健身房没新课，于是转向了新开的竞店。这属于？", options: ["早期“流产”型", "中途“夭折”型", "提前退出型", "长久保持型"], correctIdx: 1, explain: "关系在‘成长期’因未能满足价值预期而中断。" }
+        ];
+        let currentP = 'miscarriage'; let quizPool = []; let quizIdx = 0; let answered = false;
+        function switchView(id) {
+            document.getElementById('cover-view').classList.add('hidden-view');
+            document.getElementById('teaching-view').classList.add('hidden-view');
+            document.getElementById('quiz-view').classList.add('hidden-view');
+            document.getElementById(id + '-view').classList.remove('hidden-view');
+            if(id === 'teaching') renderTeaching();
+        }
+        function renderTeaching() {
+            const nav = document.getElementById('mobile-nav');
+            nav.innerHTML = Object.values(patternsData).map(p => `<button onclick="selectP('${p.id}')" class="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-black border-2 border-transparent ${p.id === currentP ? 'nav-active ' + p.navClass : 'bg-white text-slate-400'}">模式 ${p.roman}</button>`).join('');
+            const p = patternsData[currentP];
+            document.getElementById('display-title').innerText = p.title; document.getElementById('display-subtitle').innerText = p.subtitle; document.getElementById('display-desc').innerText = p.desc; document.getElementById('display-insight').innerText = `“${p.insight}”`; document.getElementById('display-icon-box').innerHTML = `<i class="${p.icon} ${p.navClass}"></i>`;
+            document.getElementById('display-reasons').innerHTML = p.reasons.map((r, i) => `<li class="flex gap-3 text-sm font-bold text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100"><span class="shrink-0 w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-xs text-slate-500">${i+1}</span>${r}</li>`).join('');
+            document.getElementById('svg-container').innerHTML = `<svg viewBox="0 0 600 220" class="w-full h-full"><line x1="20" y1="200" x2="580" y2="200" stroke="#cbd5e1" stroke-width="2" /><path d="${p.svgPath}" fill="none" stroke="${p.stroke}" stroke-width="8" stroke-linecap="round" /></svg>`;
+        }
+        function selectP(id) { currentP = id; renderTeaching(); }
+        function startQuiz() { quizPool = [...rawQuizzes].sort(() => Math.random() - 0.5); quizIdx = 0; switchView('quiz'); renderQuiz(); }
+        function renderQuiz() {
+            answered = false; const q = quizPool[quizIdx];
+            document.getElementById('quiz-progress').innerText = `实战分析 ${quizIdx+1}/${quizPool.length}`;
+            document.getElementById('quiz-scenario').innerText = q.scenario;
+            document.getElementById('quiz-feedback').classList.add('hidden-view');
+            document.getElementById('quiz-options').innerHTML = q.options.map((opt, i) => `<button onclick="checkAnswer(${i})" id="opt-${i}" class="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl text-left font-bold text-slate-700 flex items-center gap-4 active:scale-95 transition-all"><span class="shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-black">${String.fromCharCode(65+i)}</span>${opt}</button>`).join('');
+        }
+        function checkAnswer(idx) {
+            if(answered) return; answered = true; const q = quizPool[quizIdx]; const isCorrect = idx === q.correctIdx;
+            q.options.forEach((_, i) => { const btn = document.getElementById('opt-' + i); if(i === q.correctIdx) btn.className = "w-full p-4 bg-emerald-50 border-2 border-emerald-400 rounded-2xl text-left font-black text-emerald-700 flex items-center gap-4"; else if(i === idx) btn.className = "w-full p-4 bg-rose-50 border-2 border-rose-400 rounded-2xl text-left font-black text-rose-700 flex items-center gap-4"; });
+            document.getElementById('quiz-feedback').classList.remove('hidden-view');
+            document.getElementById('feedback-title').innerText = isCorrect ? '🎉 答对了！' : '❌ 答错了'; document.getElementById('feedback-explain').innerText = q.explain;
+        }
+        function nextQuizQuestion() { if(quizIdx < quizPool.length - 1) { quizIdx++; renderQuiz(); } else switchView('cover'); }
+        window.onload = () => switchView('cover');
+    </script>
+</body>
+</html>
