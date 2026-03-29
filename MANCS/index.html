@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>识别与管理价值客户 - 互动教学课件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #1e40af;
+            --secondary: #0369a1;
+            --accent: #f59e0b;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            overflow: hidden; /* 防止演示时意外滚动 */
+            background-color: #f8fafc;
+        }
+
+        .page {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+            padding: 4rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .knowledge-card {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            padding: 3rem;
+            border-top: 10px solid var(--primary);
+        }
+
+        .quiz-option {
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 3px solid #e2e8f0;
+            font-size: 1.5rem;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--secondary);
+            background-color: #f0f9ff;
+        }
+
+        .correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534;
+        }
+
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+
+        /* 针对投影优化的大字号 */
+        .text-huge { font-size: 5rem; line-height: 1.1; }
+        .text-title { font-size: 3.5rem; font-weight: 900; }
+        .text-body { font-size: 2rem; line-height: 1.6; }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-200 text-slate-600 hover:bg-slate-300">← 上一页</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-700 shadow-lg">下一页 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page active bg-slate-900 text-white text-center">
+        <!-- 移除了 CRM 核心实战课 标签 -->
+        <h1 class="text-huge font-black mb-10">识别与管理<br><span class="text-blue-400">价值客户</span></h1>
+        <p class="text-3xl text-slate-400 max-w-4xl mx-auto leading-relaxed">
+            从潜在客户的筛选到高价值客户的终身维护<br>
+            <span class="text-blue-300 font-bold mt-4 block italic">—— 让每一分营销资源都花在刀刃上</span>
+        </p>
+    </section>
+
+    <!-- 1. 知识点一：潜在客户管理策略 -->
+    <section class="page">
+        <div class="knowledge-card">
+            <h2 class="text-title text-blue-800 mb-8 text-center">核心：MAN 法则</h2>
+            <div class="grid grid-cols-3 gap-8 mb-12">
+                <div class="p-8 bg-blue-50 rounded-2xl text-center">
+                    <div class="text-6xl mb-4">💰</div>
+                    <h3 class="text-3xl font-bold">Money</h3>
+                    <p class="text-xl">购买能力</p>
+                </div>
+                <div class="p-8 bg-blue-50 rounded-2xl text-center">
+                    <div class="text-6xl mb-4">⚖️</div>
+                    <h3 class="text-3xl font-bold">Authority</h3>
+                    <p class="text-xl">购买决定权</p>
+                </div>
+                <div class="p-8 bg-blue-50 rounded-2xl text-center">
+                    <div class="text-6xl mb-4">🎯</div>
+                    <h3 class="text-3xl font-bold">Need</h3>
+                    <p class="text-xl">购买需求</p>
+                </div>
+            </div>
+            <div class="text-body bg-slate-50 p-8 rounded-2xl">
+                <p><strong>管理对策：</strong></p>
+                <ul class="list-disc list-inside space-y-2 mt-4">
+                    <li><span class="text-blue-600 font-bold">三者具备：</span>理想开发对象。</li>
+                    <li><span class="text-blue-600 font-bold">缺需求 (MA)：</span>长期跟踪，静待需求爆发。</li>
+                    <li><span class="text-blue-600 font-bold">缺决策权 (MN)：</span>公关决策者，建立更广的联系。</li>
+                    <li><span class="text-blue-600 font-bold">缺财力 (AN)：</span>保持联系，等待对方成长或推出平替。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.1 互动题一 -->
+    <section class="page bg-blue-50">
+        <div class="w-full max-w-4xl">
+            <h2 class="text-4xl font-black mb-12 text-center text-blue-900">【测试】潜在客户管理</h2>
+            <div id="quiz-container-1" class="space-y-8"></div>
+        </div>
+    </section>
+
+    <!-- 2. 知识点二：识别高价值客户 -->
+    <section class="page">
+        <div class="knowledge-card border-t-amber-500">
+            <h2 class="text-title text-amber-800 mb-8 text-center">谁才是“真英雄”？</h2>
+            <p class="text-body mb-8 text-center text-slate-500">企业不仅要满足需求，更要追求利润与增长。</p>
+            <div class="grid grid-cols-2 gap-8 text-body">
+                <div class="p-6 border-2 border-amber-100 rounded-2xl">
+                    <h4 class="font-bold text-amber-700">1. 盈利价值</h4>
+                    <p class="text-lg">能直接为企业创造当前的现金流和利润。</p>
+                </div>
+                <div class="p-6 border-2 border-amber-100 rounded-2xl">
+                    <h4 class="font-bold text-amber-700">2. 学习价值</h4>
+                    <p class="text-lg">提供改进建议，帮助企业完善产品和服务。</p>
+                </div>
+                <div class="p-6 border-2 border-amber-100 rounded-2xl">
+                    <h4 class="font-bold text-amber-700">3. 推荐价值</h4>
+                    <p class="text-lg">口碑极佳，能吸引更多潜在客户（KOL）。</p>
+                </div>
+                <div class="p-6 border-2 border-amber-100 rounded-2xl">
+                    <h4 class="font-bold text-amber-700">4. 增长价值</h4>
+                    <p class="text-lg">随着时间推移，其采购量会显著增加。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2.1 互动题二 -->
+    <section class="page bg-amber-50">
+        <div class="w-full max-w-4xl">
+            <h2 class="text-4xl font-black mb-12 text-center text-amber-900">【测试】高价值客户识别</h2>
+            <div id="quiz-container-2" class="space-y-8"></div>
+        </div>
+    </section>
+
+    <!-- 3. 知识点三：高价值客户管理对策 -->
+    <section class="page">
+        <div class="knowledge-card border-t-green-500">
+            <h2 class="text-title text-green-800 mb-8 text-center">留住巅峰客户的策略</h2>
+            <div class="space-y-8 text-body">
+                <div class="flex items-start gap-6">
+                    <div class="bg-green-100 text-green-600 px-6 py-2 rounded-full font-black">VIP</div>
+                    <p><span class="font-bold">资源倾斜：</span>将最优秀的客户经理、最好的服务资源分配给他们。</p>
+                </div>
+                <div class="flex items-start gap-6">
+                    <div class="bg-green-100 text-green-600 px-6 py-2 rounded-full font-black">PR</div>
+                    <p><span class="font-bold">关系深度：</span>超越买卖关系，建立战略合作伙伴或深厚私人友谊。</p>
+                </div>
+                <div class="flex items-start gap-6">
+                    <div class="bg-green-100 text-green-600 px-6 py-2 rounded-full font-black">SP</div>
+                    <p><span class="font-bold">个性化定制：</span>针对其特殊需求提供独一无二的解决方案。</p>
+                </div>
+                <div class="flex items-start gap-6">
+                    <div class="bg-green-100 text-green-600 px-6 py-2 rounded-full font-black">LY</div>
+                    <p><span class="font-bold">忠诚度计划：</span>建立专属积分、俱乐部或荣誉体系，增加转移成本。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3.1 互动题三 -->
+    <section class="page bg-green-50">
+        <div class="w-full max-w-4xl">
+            <h2 class="text-4xl font-black mb-12 text-center text-green-900">【测试】管理对策实战</h2>
+            <div id="quiz-container-3" class="space-y-8"></div>
+        </div>
+    </section>
+
+    <!-- 4. 总结页 -->
+    <section class="page bg-slate-900 text-white">
+        <h2 class="text-huge font-black mb-8">教学回顾</h2>
+        <div class="text-3xl space-y-6 text-slate-300">
+            <p>✅ <span class="text-blue-400">潜在客户：</span>看 <strong>MAN</strong> 法则，对症下药。</p>
+            <p>✅ <span class="text-amber-400">价值识别：</span>看 <strong>利润、增长、口碑、知识</strong>。</p>
+            <p>✅ <span class="text-green-400">管理对策：</span><strong>资源倾斜、深度连接、个性服务</strong>。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-16 bg-white text-slate-900 px-12 py-5 rounded-full text-2xl font-black hover:bg-slate-200">重新开始演示</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const pages = document.querySelectorAll('.page');
+
+        function updateNav() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').innerText = currentPage === pages.length - 1 ? '结束' : '下一页 →';
+            if (currentPage === pages.length - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+            } else {
+                document.getElementById('nextBtn').style.display = 'block';
+            }
+        }
+
+        function changePage(delta) {
+            pages[currentPage].classList.remove('active');
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= pages.length) currentPage = pages.length - 1;
+            pages[currentPage].classList.add('active');
+            updateNav();
+        }
+
+        const quizzes = {
+            1: [
+                { q: "小明想买法拉利，他有购买意愿（N）且他是自己拿主意（A），但他兜里只有100块。根据对策，你会？", options: ["立即放弃", "设法联系他父母", "保持联系，等他变富有或推入门车型", "强行推销"], a: 2 },
+                { q: "某公司采购主管非常想买你的软件（N），他也有钱（M），但合同必须老板签字。此时你的策略是？", options: ["继续说服主管", "设法联系具有签字权的老板", "坐等老板签字", "放弃该项目"], a: 1 },
+                { q: "MAN法则中，决定一个人是否是‘理想开发对象’的条件是？", options: ["三者缺一不可", "有钱就行", "有需求就行", "只要有决定权"], a: 0 }
+            ],
+            2: [
+                { q: "如果一个客户虽然买得少，但经常给产品提改进建议，这体现了什么价值？", options: ["盈利价值", "推荐价值", "学习价值", "增长价值"], a: 2 },
+                { q: "一个在行业内很有名望的专家购买了你的产品并在社交平台分享，这属于？", options: ["推荐价值", "增长价值", "现金价值", "剩余价值"], a: 0 },
+                { q: "识别高价值客户时，只看‘盈利价值’（赚多少钱）是否足够？", options: ["足够了，赚钱第一", "不够，应综合考虑口碑、建议和潜力", "看心情", "以上都不对"], a: 1 }
+            ],
+            3: [
+                { q: "当企业资源有限时，最优秀的客户经理应该服务于？", options: ["新开发的客户", "投诉最多的客户", "高价值客户", "普通路人"], a: 2 },
+                { q: "建立‘战略合作伙伴’关系主要针对的是哪类群体？", options: ["潜在客户", "所有客户", "高价值客户", "竞争对手的客户"], a: 2 },
+                { q: "高价值客户管理对策中，‘个性化定制’的核心目标是？", options: ["增加成本", "提高客户满意度与转移成本", "为了好玩", "应付差事"], a: 1 },
+                { q: "忠诚度计划的主要目的是？", options: ["乱花钱", "提升客户粘性，减少流失", "收集客户数据卖钱", "为了品牌好看"], a: 1 }
+            ]
+        };
+
+        function renderQuizzes() {
+            [1, 2, 3].forEach(id => {
+                const container = document.getElementById(`quiz-container-${id}`);
+                quizzes[id].forEach((item, qIdx) => {
+                    const box = document.createElement('div');
+                    box.className = "bg-white p-8 rounded-3xl shadow-md";
+                    box.innerHTML = `
+                        <p class="text-2xl font-bold mb-6">${qIdx + 1}. ${item.q}</p>
+                        <div class="grid grid-cols-1 gap-4">
+                            ${item.options.map((opt, oIdx) => `
+                                <div class="quiz-option p-4 px-6 rounded-xl" onclick="checkAnswer(this, ${id}, ${qIdx}, ${oIdx})">${opt}</div>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(box);
+                });
+            });
+        }
+
+        function checkAnswer(el, poolId, qIdx, oIdx) {
+            const pool = quizzes[poolId];
+            const correctIdx = pool[qIdx].a;
+            const parent = el.parentElement;
+            
+            if (parent.dataset.answered) return;
+            parent.dataset.answered = "true";
+
+            const options = parent.querySelectorAll('.quiz-option');
+            options.forEach((opt, idx) => {
+                if (idx === correctIdx) {
+                    opt.classList.add('correct');
+                } else if (idx === oIdx) {
+                    opt.classList.add('wrong');
+                }
+            });
+        }
+
+        window.onload = () => {
+            renderQuizzes();
+            updateNav();
+        };
+
+        // 支持键盘翻页
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changePage(1);
+            if (e.key === 'ArrowLeft') changePage(-1);
+        });
+    </script>
+</body>
+</html>
