@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度访谈法典型场景分析 - 演示版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #fcfcfc;
+        }
+
+        .presentation-font {
+            font-size: 1.5rem; /* 基础投影字号 */
+            line-height: 1.6;
+        }
+
+        .hero-section {
+            height: 100vh;
+            background: linear-gradient(135deg, #1e293b 0%, #0891b2 100%);
+        }
+
+        .section-container {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-shadow {
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        .quiz-option {
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 3px solid #e2e8f0;
+        }
+
+        .quiz-option:hover {
+            border-color: #0891b2;
+            background-color: #f0f9ff;
+        }
+
+        .correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534;
+        }
+
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0891b2;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="presentation-font text-slate-800">
+
+    <!-- 1. 封面页 -->
+    <section class="hero-section flex items-center justify-center text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M 80 0 L 0 0 0 80" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+        <div class="z-10 text-center px-6">
+            <h1 class="text-7xl md:text-9xl font-black mb-8 tracking-tight animate-pulse">深度访谈法</h1>
+            <p class="text-3xl md:text-4xl font-light mb-12 text-cyan-100">识别客户需求的典型场景与核心策略</p>
+            <div class="flex gap-6 justify-center">
+                <button onclick="scrollToSection('summary')" class="bg-white text-cyan-900 px-12 py-5 rounded-full text-2xl font-black hover:bg-cyan-50 transition shadow-2xl">
+                    开始浏览演示内容
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 内容总结：典型场景 -->
+    <section id="summary" class="section-container max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-6xl font-black text-slate-900 mb-4">访谈案例核心提炼</h2>
+            <div class="w-32 h-3 bg-cyan-600 mx-auto rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- 场景一：智能家居 -->
+            <div class="bg-white p-12 rounded-[3rem] card-shadow border border-slate-100">
+                <div class="flex items-center mb-8">
+                    <span class="bg-cyan-100 text-cyan-700 p-4 rounded-2xl mr-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    </span>
+                    <h3 class="text-4xl font-black">场景 A：智能家居</h3>
+                </div>
+                <div class="space-y-6 text-2xl text-slate-600">
+                    <p><strong class="text-slate-900">● 核心痛点：</strong> 品牌兼容性差、设置繁琐、语音助手响应延迟。</p>
+                    <p><strong class="text-slate-900">● 用户应对：</strong> 建立“生态中心”（如智能音箱），统一品牌或协议以降低管理成本。</p>
+                    <p><strong class="text-slate-900">● 未来期待：</strong> 真正的“人性化”——不仅是语音控制，而是根据习惯自动调整环境，如“电影模式”一键触发。</p>
+                </div>
+            </div>
+
+            <!-- 场景二：电子商务 -->
+            <div class="bg-white p-12 rounded-[3rem] card-shadow border border-slate-100">
+                <div class="flex items-center mb-8">
+                    <span class="bg-amber-100 text-amber-700 p-4 rounded-2xl mr-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    </span>
+                    <h3 class="text-4xl font-black">场景 B：电子商务</h3>
+                </div>
+                <div class="space-y-6 text-2xl text-slate-600">
+                    <p><strong class="text-slate-900">● 核心痛点：</strong> 描述不实（图物不符）、物流速度波动大、审核机制缺失。</p>
+                    <p><strong class="text-slate-900">● 爽点来源：</strong> 主动的折扣优惠、极速的物流体验、客服人员的优质态度。</p>
+                    <p><strong class="text-slate-900">● 优化策略：</strong> 加强商家资质审核，将描述真实性作为平台核心信用指标。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 互动题目 -->
+    <section id="quiz" class="bg-slate-900 py-32 text-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-6xl font-black mb-6">互动测评</h2>
+                <p class="text-2xl text-slate-400">检测您对深度访谈法核心逻辑的理解</p>
+            </div>
+
+            <div id="quiz-container" class="space-y-20">
+                <!-- 题目由 JS 生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 底部 -->
+    <footer class="py-20 bg-black text-center text-slate-500">
+        <p class="text-2xl">演示结束 · 感谢观看</p>
+        <p class="mt-4 opacity-50">Content Source: 3.1 深度访谈法的典型场景.pdf</p>
+    </footer>
+
+    <script>
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        const quizData = [
+            {
+                question: "在智能家居场景中，李先生解决兼容性问题的主要方法是？",
+                options: ["放弃使用不兼容设备", "联系厂家上门维修", "购买智能音箱作为中心控制器", "学习编程自己写接口"],
+                answer: 2
+            },
+            {
+                question: "深度访谈中，访谈者追问“您是怎么解决这个问题的？”目的是为了发现？",
+                options: ["用户的消费水平", "用户的替代方案与隐性需求", "用户的家庭住址", "设备的具体型号"],
+                answer: 1
+            },
+            {
+                question: "电商用户王女士认为，平台最应该改进的地方是？",
+                options: ["降低商品价格", "增加社交分享功能", "加强对商家的审核，确保描述真实", "增加更多商品种类"],
+                answer: 2
+            },
+            {
+                question: "文中提到的“电影模式”建议，体现了智能家居未来的什么发展方向？",
+                options: ["更便宜的价格", "更人性化与场景化的定制", "更亮的灯光效果", "更长的电池寿命"],
+                answer: 1
+            },
+            {
+                question: "深度访谈法与问卷调查相比，其最大的优势在于？",
+                options: ["样本量大", "统计分析方便", "能够深入挖掘行为背后的原因和感受", "执行成本低"],
+                answer: 2
+            }
+        ];
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            quizData.forEach((item, index) => {
+                const quizBox = document.createElement('div');
+                quizBox.className = "quiz-box";
+                quizBox.innerHTML = `
+                    <h3 class="text-4xl font-bold mb-8"><span class="text-cyan-400 mr-4">Q${index + 1}.</span>${item.question}</h3>
+                    <div class="grid grid-cols-1 gap-6">
+                        ${item.options.map((opt, optIndex) => `
+                            <div class="quiz-option p-8 rounded-3xl text-2xl font-medium" onclick="checkAnswer(this, ${index}, ${optIndex})">
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-${index}" class="mt-6 text-2xl font-bold hidden"></div>
+                `;
+                container.appendChild(quizBox);
+            });
+        }
+
+        function checkAnswer(element, quizIndex, optionIndex) {
+            const correctAnswer = quizData[quizIndex].answer;
+            const options = element.parentElement.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById(`feedback-${quizIndex}`);
+
+            // 禁止重复点击
+            if (element.parentElement.classList.contains('answered')) return;
+            element.parentElement.classList.add('answered');
+
+            options.forEach((opt, idx) => {
+                if (idx === correctAnswer) {
+                    opt.classList.add('correct');
+                } else if (idx === optionIndex && idx !== correctAnswer) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            feedback.classList.remove('hidden');
+            if (optionIndex === correctAnswer) {
+                feedback.innerHTML = "🎉 回答正确！";
+                feedback.className = "mt-6 text-2xl font-bold text-green-400";
+            } else {
+                feedback.innerHTML = "❌ 回答错误，正确答案是：" + quizData[quizIndex].options[correctAnswer];
+                feedback.className = "mt-6 text-2xl font-bold text-red-400";
+            }
+        }
+
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
