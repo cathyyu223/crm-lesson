@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>识别与管理价值客户 - 互动教学课件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #1e40af;
+            --secondary: #0369a1;
+            --dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 禁止全局滚动，由 page 容器处理 */
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* 核心滚动容器 */
+        .page {
+            display: none; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto; /* 允许纵向滚动 */
+            -webkit-overflow-scrolling: touch;
+            padding: 2rem 1rem 12rem 1rem; /* 底部留出足够空间给按钮 */
+            box-sizing: border-box;
+            background-color: inherit;
+        }
+
+        /* 活动页面显示 */
+        .page.active {
+            display: block !important;
+        }
+
+        /* 封面和短内容的居中布局 */
+        .page-flex-center {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .page-flex-center.active {
+            display: flex !important;
+        }
+
+        .knowledge-card {
+            background: white;
+            border-radius: 2.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 1100px;
+            padding: 3rem;
+            border-top: 12px solid var(--primary);
+            margin: 2rem auto;
+        }
+
+        .quiz-option {
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 4px solid #e2e8f0;
+            font-size: 1.6rem;
+            padding: 1.2rem 2rem;
+            border-radius: 1.5rem;
+            background: white;
+            margin-bottom: 0.8rem;
+            display: block;
+            width: 100%;
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--secondary);
+            background-color: #f0f9ff;
+        }
+
+        .correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534;
+        }
+
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+
+        /* 投影优化字号 */
+        .text-huge { font-size: clamp(3.5rem, 8vw, 6rem); line-height: 1.1; font-weight: 900; }
+        .text-title { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; }
+
+        /* 导航按钮固定在最上层 */
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1.2rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        /* 自定义滚动条样式，使其在投影时可见 */
+        .page::-webkit-scrollbar {
+            width: 12px;
+        }
+        .page::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.03);
+        }
+        .page::-webkit-scrollbar-thumb {
+            background: rgba(30, 64, 175, 0.3);
+            border-radius: 10px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+
+        .cover-bg {
+            background-color: var(--dark) !important;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-200 text-slate-700 hover:bg-slate-300">← 上一页</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-700">下一页 →</button>
+
+    <!-- 0. 封面 (使用居中布局) -->
+    <section class="page page-flex-center active cover-bg">
+        <h1 class="text-huge mb-10">识别与管理<br><span class="text-blue-400">价值客户</span></h1>
+        <p class="text-2xl md:text-4xl text-slate-300 max-w-4xl leading-relaxed px-6">
+            从潜在客户的筛选到高价值客户的终身维护<br>
+            <span class="text-blue-300 font-bold mt-8 block italic">—— 让每一分营销资源都花在刀刃上</span>
+        </p>
+    </section>
+
+    <!-- 1. 知识点一：潜在客户管理策略 -->
+    <section class="page">
+        <div class="knowledge-card">
+            <h2 class="text-title text-blue-800 mb-10 text-center">核心：MAN 法则</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="p-8 bg-blue-50 rounded-3xl text-center shadow-inner">
+                    <div class="text-7xl mb-4">💰</div>
+                    <h3 class="text-3xl font-black">Money</h3>
+                    <p class="text-xl font-bold text-blue-600">购买能力</p>
+                </div>
+                <div class="p-8 bg-blue-50 rounded-3xl text-center shadow-inner">
+                    <div class="text-7xl mb-4">⚖️</div>
+                    <h3 class="text-3xl font-black">Authority</h3>
+                    <p class="text-xl font-bold text-blue-600">购买决定权</p>
+                </div>
+                <div class="p-8 bg-blue-50 rounded-3xl text-center shadow-inner">
+                    <div class="text-7xl mb-4">🎯</div>
+                    <h3 class="text-3xl font-black">Need</h3>
+                    <p class="text-xl font-bold text-blue-600">购买需求</p>
+                </div>
+            </div>
+            <div class="text-body bg-slate-50 p-8 rounded-3xl border-l-[16px] border-blue-500 shadow-sm">
+                <p class="font-black text-3xl mb-6 text-slate-900">管理对策：</p>
+                <ul class="space-y-4 text-2xl">
+                    <li>🔹 <span class="text-blue-700 font-black">三者具备：</span>理想开发对象</li>
+                    <li>🔹 <span class="text-blue-700 font-black">缺需求 (MA)：</span>长期跟踪，静待需求爆发</li>
+                    <li>🔹 <span class="text-blue-700 font-black">缺决策权 (MN)：</span>公关决策者，建立更广联系</li>
+                    <li>🔹 <span class="text-blue-700 font-black">缺财力 (AN)：</span>保持联系，等待对方成长</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.1 互动题一 (长内容，自动触发滚动条) -->
+    <section class="page bg-blue-50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-black mb-12 text-center text-blue-900 pt-10">【互动测试】潜在客户管理</h2>
+            <div id="quiz-container-1" class="space-y-10"></div>
+        </div>
+    </section>
+
+    <!-- 2. 知识点二：识别高价值客户 -->
+    <section class="page">
+        <div class="knowledge-card border-t-amber-500">
+            <h2 class="text-title text-amber-800 mb-10 text-center">谁才是“真英雄”？</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-body">
+                <div class="p-8 border-4 border-amber-100 rounded-3xl bg-amber-50/30">
+                    <h4 class="font-black text-amber-700 text-3xl mb-4">1. 盈利价值</h4>
+                    <p class="text-2xl">能直接为企业创造当前的现金流和利润。</p>
+                </div>
+                <div class="p-8 border-4 border-amber-100 rounded-3xl bg-amber-50/30">
+                    <h4 class="font-black text-amber-700 text-3xl mb-4">2. 学习价值</h4>
+                    <p class="text-2xl">提供改进建议，帮企业完善产品和服务。</p>
+                </div>
+                <div class="p-8 border-4 border-amber-100 rounded-3xl bg-amber-50/30">
+                    <h4 class="font-black text-amber-700 text-3xl mb-4">3. 推荐价值</h4>
+                    <p class="text-2xl">口碑极佳，能吸引更多潜在客户（KOL）。</p>
+                </div>
+                <div class="p-8 border-4 border-amber-100 rounded-3xl bg-amber-50/30">
+                    <h4 class="font-black text-amber-700 text-3xl mb-4">4. 增长价值</h4>
+                    <p class="text-2xl">随时间推移，其采购量会显著增加。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2.1 互动题二 -->
+    <section class="page bg-amber-50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-black mb-12 text-center text-amber-900 pt-10">【互动测试】高价值客户识别</h2>
+            <div id="quiz-container-2" class="space-y-10"></div>
+        </div>
+    </section>
+
+    <!-- 3. 知识点三：高价值客户管理对策 -->
+    <section class="page">
+        <div class="knowledge-card border-t-green-500">
+            <h2 class="text-title text-green-800 mb-10 text-center">高价值客户管理对策</h2>
+            <div class="space-y-8">
+                <div class="flex items-center gap-6 p-6 bg-green-50 rounded-3xl shadow-sm">
+                    <div class="bg-green-600 text-white text-3xl px-6 py-2 rounded-full font-black">VIP</div>
+                    <p class="text-2xl font-bold"><span class="text-green-800">资源倾斜：</span>分配最好的服务资源。</p>
+                </div>
+                <div class="flex items-center gap-6 p-6 bg-green-50 rounded-3xl shadow-sm">
+                    <div class="bg-green-600 text-white text-3xl px-6 py-2 rounded-full font-black">PR</div>
+                    <p class="text-2xl font-bold"><span class="text-green-800">关系深度：</span>建立战略合作或深厚友谊。</p>
+                </div>
+                <div class="flex items-center gap-6 p-6 bg-green-50 rounded-3xl shadow-sm">
+                    <div class="bg-green-600 text-white text-3xl px-6 py-2 rounded-full font-black">SP</div>
+                    <p class="text-2xl font-bold"><span class="text-green-800">个性定制：</span>提供独一无二的解决方案。</p>
+                </div>
+                <div class="flex items-center gap-6 p-6 bg-green-50 rounded-3xl shadow-sm">
+                    <div class="bg-green-600 text-white text-3xl px-6 py-2 rounded-full font-black">LY</div>
+                    <p class="text-2xl font-bold"><span class="text-green-800">忠诚计划：</span>建立荣誉体系，锁定客户。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3.1 互动题三 -->
+    <section class="page bg-green-50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-black mb-12 text-center text-green-900 pt-10">【互动测试】管理对策实战</h2>
+            <div id="quiz-container-3" class="space-y-10"></div>
+        </div>
+    </section>
+
+    <!-- 4. 总结页 -->
+    <section class="page page-flex-center cover-bg">
+        <h2 class="text-huge mb-12">教学回顾</h2>
+        <div class="text-3xl md:text-5xl space-y-10 text-slate-300 font-bold">
+            <p>✅ <span class="text-blue-400 font-black">潜在识别：</span>MAN 法则（钱/权/需）</p>
+            <p>✅ <span class="text-amber-400 font-black">价值维度：</span>利润/学习/推荐/增长</p>
+            <p>✅ <span class="text-green-400 font-black">管理对策：</span>资源倾斜与深度连接</p>
+        </div>
+        <button onclick="location.reload()" class="mt-20 bg-white text-slate-900 px-14 py-6 rounded-full text-3xl font-black hover:bg-slate-200 shadow-2xl">
+            重新演示
+        </button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const pages = document.querySelectorAll('.page, .page-flex-center');
+
+        function updateNav() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            if (currentPage === pages.length - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+            } else {
+                document.getElementById('nextBtn').style.display = 'block';
+                document.getElementById('nextBtn').innerText = '下一页 →';
+            }
+        }
+
+        function changePage(delta) {
+            pages[currentPage].classList.remove('active');
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= pages.length) currentPage = pages.length - 1;
+            pages[currentPage].classList.add('active');
+            
+            // 切换页面后强制滚动条回到顶部
+            pages[currentPage].scrollTop = 0;
+            updateNav();
+        }
+
+        const quizzes = {
+            1: [
+                { q: "小明想买豪车，有意愿且能自己拿主意，但没钱。根据对策，你会？", options: ["立即放弃", "设法联系他父母", "保持联系，等他变富有", "强行推销"], a: 2 },
+                { q: "某采购主管非常想买你的产品（N），他也有钱（M），但无签字权。策略是？", options: ["继续说服主管", "设法联系具有签字权的领导", "坐等签字", "放弃该项目"], a: 1 },
+                { q: "MAN法则中，理想开发对象的条件是？", options: ["三者缺一不可", "有钱就行", "有需求就行", "只要有权"], a: 0 }
+            ],
+            2: [
+                { q: "客户虽然买得少，但经常给产品提改进建议，体现了什么价值？", options: ["盈利价值", "推荐价值", "学习价值", "增长价值"], a: 2 },
+                { q: "行业专家购买产品并在社交平台好评分享，这属于？", options: ["推荐价值", "增长价值", "现金价值", "剩余价值"], a: 0 },
+                { q: "识别高价值客户时，只看‘盈利价值’是否足够？", options: ["足够了，赚钱第一", "不够，应综合考虑口碑和潜力", "看心情", "以上都不对"], a: 1 }
+            ],
+            3: [
+                { q: "资源有限时，最优秀的客户经理应该服务于？", options: ["新客户", "高价值客户", "普通路人", "竞争对手的客户"], a: 1 },
+                { q: "高价值客户管理中，‘个性化定制’的核心目标是？", options: ["增加成本", "提高粘性与转移成本", "为了好玩", "应付差事"], a: 1 },
+                { q: "忠诚度计划的主要目的是？", options: ["乱花钱", "提升粘性，锁定客户", "卖客户数据", "为了好看"], a: 1 }
+            ]
+        };
+
+        function renderQuizzes() {
+            [1, 2, 3].forEach(id => {
+                const container = document.getElementById(`quiz-container-${id}`);
+                if (!container) return;
+                quizzes[id].forEach((item, qIdx) => {
+                    const box = document.createElement('div');
+                    box.className = "bg-white p-10 rounded-[2.5rem] shadow-md border-2 border-slate-100";
+                    box.innerHTML = `
+                        <p class="text-3xl font-black mb-8 text-slate-800 leading-snug"><span class="text-blue-600 mr-2">#${qIdx + 1}</span> ${item.q}</p>
+                        <div class="space-y-4">
+                            ${item.options.map((opt, oIdx) => `
+                                <button class="quiz-option" onclick="checkAnswer(this, ${id}, ${qIdx}, ${oIdx})">${opt}</button>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(box);
+                });
+            });
+        }
+
+        function checkAnswer(el, poolId, qIdx, oIdx) {
+            const pool = quizzes[poolId];
+            const correctIdx = pool[qIdx].a;
+            const parent = el.parentElement;
+            
+            if (parent.dataset.answered) return;
+            parent.dataset.answered = "true";
+
+            const options = parent.querySelectorAll('.quiz-option');
+            options.forEach((opt, idx) => {
+                if (idx === correctIdx) {
+                    opt.classList.add('correct');
+                } else if (idx === oIdx) {
+                    opt.classList.add('wrong');
+                }
+            });
+        }
+
+        window.onload = () => {
+            renderQuizzes();
+            updateNav();
+        };
+
+        // 键盘快捷键翻页
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault(); 
+                changePage(1);
+            }
+            if (e.key === 'ArrowLeft') changePage(-1);
+        });
+    </script>
+</body>
+</html>
