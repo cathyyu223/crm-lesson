@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>门当户对：目标客户选择策略</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .presentation-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 2rem;
+            box-sizing: border-box;
+        }
+
+        /* 矩阵容器优化 */
+        .matrix-wrapper {
+            position: relative;
+            padding: 4rem;
+            background: white;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 850px;
+            aspect-ratio: 1.2 / 1;
+            position: relative;
+        }
+
+        .matrix-cell {
+            border-radius: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: 4px solid transparent;
+        }
+
+        .matrix-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        /* 坐标轴箭头样式 */
+        .axis {
+            position: absolute;
+            background-color: #94a3b8;
+        }
+        
+        .y-axis-line {
+            width: 4px;
+            height: calc(100% + 40px);
+            left: -20px;
+            top: -20px;
+        }
+        
+        .x-axis-line {
+            height: 4px;
+            width: calc(100% + 40px);
+            left: -20px;
+            bottom: -20px;
+        }
+
+        .axis-arrow {
+            position: absolute;
+            font-size: 1.5rem;
+            color: #64748b;
+        }
+
+        .axis-label-main {
+            position: absolute;
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .axis-sub-label {
+            position: absolute;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { width: 0; }
+
+        .big-text { font-size: 1.8rem; line-height: 1.6; }
+        .huge-title { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 象限配色增强 */
+        .q-focus { background-color: #dcfce7; border-color: #22c55e; color: #166534; }
+        .q-opp { background-color: #fef9c3; border-color: #eab308; color: #854d0e; }
+        .q-passive { background-color: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+        .q-abandon { background-color: #fee2e2; border-color: #f87171; color: #991b1b; }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- 1. 封面 -->
+    <section id="cover" class="presentation-page bg-slate-900 text-white text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="white"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#dots)" />
+            </svg>
+        </div>
+        <div class="z-10 fade-in">
+            <h1 class="huge-title mb-8 leading-tight">如何选择<br><span class="text-blue-400">“门当户对”</span>的客户</h1>
+            <p class="text-3xl md:text-4xl font-light text-slate-400 mb-16">寻找客户价值与企业能力的完美结合点</p>
+            <button onclick="document.getElementById('value').scrollIntoView({behavior:'smooth'})" class="bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-full text-2xl font-black transition shadow-2xl hover:scale-105">
+                开启学习之旅
+            </button>
+        </div>
+    </section>
+
+    <!-- 2. 客户吸引力分析 -->
+    <section id="value" class="presentation-page max-w-7xl mx-auto">
+        <div class="mb-16">
+            <span class="text-blue-600 font-black text-2xl uppercase tracking-widest">Step 01</span>
+            <h2 class="text-6xl font-black mt-4">判断客户吸引力</h2>
+            <p class="text-3xl text-slate-500 mt-4">客户是否有较高的综合价值？是否能带来收益？</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white p-10 rounded-[3rem] shadow-xl border-t-8 border-blue-500">
+                <h3 class="text-3xl font-black mb-6">💰 交易价值</h3>
+                <p class="big-text text-slate-600">总购买金额、需求扩大产生的<span class="font-bold text-slate-900">增量购买</span>及交叉购买能力。</p>
+            </div>
+            <div class="bg-white p-10 rounded-[3rem] shadow-xl border-t-8 border-cyan-500">
+                <h3 class="text-3xl font-black mb-6">📢 无形价值</h3>
+                <p class="big-text text-slate-600">规模效应价值、<span class="font-bold text-slate-900">口碑传播价值</span>以及行业信息价值。</p>
+            </div>
+            <div class="bg-white p-10 rounded-[3rem] shadow-xl border-t-8 border-red-500">
+                <h3 class="text-3xl font-black mb-6">⚠️ 风险/成本</h3>
+                <p class="big-text text-slate-600">服务该客户的<span class="font-bold text-slate-900">总成本</span>，以及信用、资金、违约等风险评估。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 企业综合能力分析 -->
+    <section id="ability" class="presentation-page bg-slate-50">
+        <div class="max-w-7xl mx-auto w-full">
+            <div class="mb-16 text-center">
+                <span class="text-emerald-600 font-black text-2xl uppercase tracking-widest">Step 02</span>
+                <h2 class="text-6xl font-black mt-4">衡量自身能力</h2>
+                <p class="text-3xl text-slate-500 mt-4">是否有足够的实力去满足客户需求？</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 px-4">
+                <div class="bg-white p-8 rounded-2xl text-center shadow-md">
+                    <div class="text-5xl mb-4">⚙️</div>
+                    <p class="text-2xl font-bold">技术能力</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl text-center shadow-md">
+                    <div class="text-5xl mb-4">👥</div>
+                    <p class="text-2xl font-bold">人力资源</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl text-center shadow-md">
+                    <div class="text-5xl mb-4">🏦</div>
+                    <p class="text-2xl font-bold">财力物力</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl text-center shadow-md">
+                    <div class="text-5xl mb-4">📐</div>
+                    <p class="text-2xl font-bold">管理水平</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl text-center shadow-md">
+                    <div class="text-5xl mb-4">🏗️</div>
+                    <p class="text-2xl font-bold">配套设施</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 目标客户选择矩阵 (优化后的版本) -->
+    <section id="matrix" class="presentation-page">
+        <div class="max-w-7xl mx-auto w-full flex flex-col items-center">
+            <div class="mb-20 text-center">
+                <span class="text-purple-600 font-black text-2xl uppercase tracking-widest">Step 03</span>
+                <h2 class="text-6xl font-black mt-4">客户选择矩阵图</h2>
+                <p class="text-3xl text-slate-500 mt-4">点击象限，锁定您的战略目标</p>
+            </div>
+
+            <div class="matrix-wrapper">
+                <!-- 垂直轴 (Y) -->
+                <div class="axis y-axis-line"></div>
+                <div class="axis-arrow" style="left: -27px; top: -50px;">▲</div>
+                <div class="axis-label-main" style="transform: rotate(-90deg); left: -120px; top: 40%;">企业综合能力</div>
+                <div class="axis-sub-label" style="left: -60px; top: -10px;">优</div>
+                <div class="axis-sub-label" style="left: -60px; bottom: -10px;">劣</div>
+
+                <!-- 水平轴 (X) -->
+                <div class="axis x-axis-line"></div>
+                <div class="axis-arrow" style="right: -45px; bottom: -32px;">▶</div>
+                <div class="axis-label-main" style="bottom: -85px; left: 35%;">客户综合价值</div>
+                <div class="axis-sub-label" style="left: -15px; bottom: -55px;">低</div>
+                <div class="axis-sub-label" style="right: -15px; bottom: -55px;">高</div>
+
+                <div class="matrix-grid">
+                    <!-- 象限 C: 消极选择 -->
+                    <div onclick="showStrategy('消极选择', '客户价值较低，但企业能力很强。应作为补充业务，不宜投入核心精力，保持现状即可。')" class="matrix-cell q-passive">
+                        <span class="text-5xl font-black mb-2">消极选择</span>
+                        <span class="text-xl opacity-60 font-bold">(能力优 + 价值低)</span>
+                    </div>
+                    <!-- 象限 D: 重点选择 -->
+                    <div onclick="showStrategy('重点选择', '【核心目标】客户价值极高且企业完全能够胜任。这是企业的生存之本，应投入最优质资源进行维护。')" class="matrix-cell q-focus">
+                        <span class="text-5xl font-black mb-2">重点选择</span>
+                        <span class="text-xl opacity-70 font-bold">(能力优 + 价值高)</span>
+                    </div>
+                    <!-- 象限 A: 放弃选择 -->
+                    <div onclick="showStrategy('放弃选择', '客户价值低且企业能力也无法满足。直接放弃，不要在这些客户身上浪费任何营销成本。')" class="matrix-cell q-abandon">
+                        <span class="text-5xl font-black mb-2">放弃选择</span>
+                        <span class="text-xl opacity-60 font-bold">(能力劣 + 价值低)</span>
+                    </div>
+                    <!-- 象限 B: 择机选择 -->
+                    <div onclick="showStrategy('择机选择', '客户价值很高，但目前企业能力有限。需要审视是否可以通过技术升级或外部合作来获取机会。')" class="matrix-cell q-opp">
+                        <span class="text-5xl font-black mb-2">择机选择</span>
+                        <span class="text-xl opacity-70 font-bold">(能力劣 + 价值高)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 策略显示区 -->
+            <div id="strategy-box" class="mt-24 p-12 bg-slate-900 text-white rounded-[3rem] max-w-3xl w-full text-center hidden shadow-2xl animate-bounce-short">
+                <h4 id="strategy-title" class="text-5xl font-black mb-6 text-blue-400"></h4>
+                <p id="strategy-desc" class="text-2xl text-slate-300 leading-relaxed"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 结尾 -->
+    <footer class="py-24 bg-slate-900 text-center text-white">
+        <p class="text-3xl font-black mb-4">做最懂客户的企业</p>
+        <p class="text-xl text-slate-500">根据《3.2 如何选择“门当户对”的客户》制作</p>
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="mt-12 text-blue-400 font-bold border-b-2 border-blue-400 pb-2">返回顶部</button>
+    </footer>
+
+    <script>
+        function showStrategy(title, desc) {
+            const box = document.getElementById('strategy-box');
+            const sTitle = document.getElementById('strategy-title');
+            const sDesc = document.getElementById('strategy-desc');
+
+            box.classList.remove('hidden');
+            sTitle.innerText = title;
+            sDesc.innerText = desc;
+
+            // 滚动到该区域
+            box.scrollIntoView({behavior:'smooth', block: 'center'});
+        }
+    </script>
+</body>
+</html>
