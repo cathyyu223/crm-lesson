@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业定价策略 - 互动教学课件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            scroll-behavior: smooth;
+        }
+
+        /* 全屏页面容器 */
+        .page-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5rem;
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* 投影专用大字号 */
+        .hero-title { font-size: 6.5rem; line-height: 1; font-weight: 900; letter-spacing: -0.02em; }
+        .strat-title { font-size: 4.5rem; font-weight: 700; margin-bottom: 2.5rem; }
+        .main-text { font-size: 2.4rem; line-height: 1.6; color: #94a3b8; max-width: 1000px; }
+        .example-box { 
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 12px solid;
+            padding: 2.5rem;
+            margin-top: 3rem;
+            font-size: 2.2rem;
+            border-radius: 0 1.5rem 1.5rem 0;
+        }
+
+        /* 侧边导航点 */
+        .dot-nav {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 100;
+        }
+        .dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #334155;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dot.active { background: #38bdf8; transform: scale(1.6); box-shadow: 0 0 15px #38bdf8; }
+
+        .highlight-yellow { color: #facc15; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <!-- 导航点 -->
+    <nav class="dot-nav">
+        <div class="dot active" onclick="go(0)"></div>
+        <div class="dot" onclick="go(1)"></div>
+        <div class="dot" onclick="go(2)"></div>
+        <div class="dot" onclick="go(3)"></div>
+        <div class="dot" onclick="go(4)"></div>
+        <div class="dot" onclick="go(5)"></div>
+        <div class="dot" onclick="go(6)"></div>
+    </nav>
+
+    <!-- 封面 -->
+    <section class="page-section items-center text-center" id="p0">
+        <div class="bg-blue-600 text-white px-6 py-2 rounded-full text-2xl font-bold mb-8">客户关系管理 · 深度开发篇</div>
+        <h1 class="hero-title">企业开发中的<br><span class="text-sky-400">核心定价策略</span></h1>
+        <p class="text-4xl mt-12 text-slate-400 font-light">科学定价：平衡企业利润与客户感知</p>
+        <button onclick="go(1)" class="mt-16 bg-sky-500 hover:bg-sky-400 text-white px-12 py-6 rounded-2xl text-3xl font-bold transition-all transform hover:scale-105">开始演示项目</button>
+    </section>
+
+    <!-- 1. 折扣定价 -->
+    <section class="page-section" id="p1">
+        <h2 class="strat-title text-sky-400">01. 折扣定价 (Discount Pricing)</h2>
+        <p class="main-text">直接或间接地降低价格，目的是让客户产生明显的<span class="highlight-yellow">“得利感”</span>。</p>
+        <div class="grid grid-cols-3 gap-10 mt-10">
+            <div class="example-box border-sky-500">
+                <div class="text-sky-400 font-bold mb-2">价格折扣</div>
+                打折、满减<br>“全场5折”
+            </div>
+            <div class="example-box border-sky-500">
+                <div class="text-sky-400 font-bold mb-2">数量折扣</div>
+                买3送1<br>满10赠2
+            </div>
+            <div class="example-box border-sky-500">
+                <div class="text-sky-400 font-bold mb-2">价格折让</div>
+                以旧换新<br>朋友圈集赞
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 阶梯定价 -->
+    <section class="page-section bg-slate-900" id="p2">
+        <h2 class="strat-title text-pink-400">02. 阶梯定价 (Tiered Pricing)</h2>
+        <div class="flex gap-20 items-center">
+            <div class="flex-1">
+                <p class="main-text">根据<span class="highlight-yellow">购买数量</span>设定不同价格。数量越多，单价越低。适用于网店和关联性强的产品。</p>
+                <div class="example-box border-pink-500 text-slate-300">
+                    💡 作用：提升销量总额，有效增加“客单价”。
+                </div>
+            </div>
+            <div class="flex-1 bg-slate-800 p-10 rounded-3xl border border-pink-500/20 shadow-2xl">
+                <div class="text-2xl mb-4 text-pink-300">价格模型展示：</div>
+                <div class="space-y-4">
+                    <div class="bg-pink-500/10 p-4 rounded-lg border border-pink-500/30">1-10件：¥100/件</div>
+                    <div class="bg-pink-500/20 p-4 rounded-lg border border-pink-500/50">11-50件：¥85/件</div>
+                    <div class="bg-pink-500/40 p-6 rounded-lg font-bold text-3xl">50件以上：¥60/件</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 心理定价 -->
+    <section class="page-section" id="p3">
+        <h2 class="strat-title text-amber-400">03. 心理定价 (Psychological Pricing)</h2>
+        <p class="main-text mb-10">利用客户对数字的<span class="highlight-yellow">感性联想</span>。并非降价，而是改变呈现方式。</p>
+        <div class="space-y-6">
+            <div class="flex items-center gap-10 example-box border-amber-500">
+                <span class="text-7xl font-black text-white">¥99.9</span>
+                <div><b class="text-amber-400">尾数定价：</b>利用“不满10”的感觉，暗示价格极其便宜。</div>
+            </div>
+            <div class="flex items-center gap-10 example-box border-amber-500">
+                <span class="text-7xl font-black text-white">¥10.02</span>
+                <div><b class="text-amber-400">小数定价：</b>给人“经过精确核算”的严谨感，多见于超市。</div>
+            </div>
+            <div class="flex items-center gap-10 example-box border-amber-500">
+                <span class="text-7xl font-black text-white">¥1000</span>
+                <div><b class="text-amber-400">整数定价：</b>满足求名、求方便的心理，适用于名牌优质产品。</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 差别定价 -->
+    <section class="page-section bg-slate-900" id="p4">
+        <h2 class="strat-title text-emerald-400">04. 差别定价 (Differential Pricing)</h2>
+        <p class="main-text">针对<span class="highlight-yellow">不同客户、不同时段</span>给出差异化价格。最大化榨取剩余价值。</p>
+        <div class="grid grid-cols-2 gap-8 mt-10">
+            <div class="p-8 bg-emerald-900/20 rounded-2xl border border-emerald-500/30">
+                <h4 class="text-3xl font-bold text-emerald-400 mb-4">时段差别</h4>
+                景区淡季门票、夜间流量包、分时电价。
+            </div>
+            <div class="p-8 bg-emerald-900/20 rounded-2xl border border-emerald-500/30">
+                <h4 class="text-3xl font-bold text-emerald-400 mb-4">客户差别</h4>
+                学生证半价、新老客户差异化补贴。
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 动态定价 -->
+    <section class="page-section" id="p5">
+        <h2 class="strat-title text-indigo-400">05. 动态定价 (Dynamic Pricing)</h2>
+        <div class="flex flex-col items-center">
+            <p class="main-text text-center mb-12">根据<span class="highlight-yellow">实时供需关系</span>与竞争状况，灵活调整价格。在航空、酒店行业应用最广。</p>
+            <div class="flex gap-10">
+                <div class="bg-indigo-600 p-12 rounded-3xl text-center">
+                    <div class="text-2xl mb-2 text-indigo-200">需求爆发</div>
+                    <div class="text-6xl font-bold">提价 📈</div>
+                </div>
+                <div class="bg-slate-700 p-12 rounded-3xl text-center">
+                    <div class="text-2xl mb-2 text-slate-400">需求疲软</div>
+                    <div class="text-6xl font-bold">降价 📉</div>
+                </div>
+            </div>
+            <p class="mt-12 text-2xl text-slate-500 italic">⚠️ 需要强大的大数据分析和预测建模能力。</p>
+        </div>
+    </section>
+
+    <!-- 6. 捆绑定价 -->
+    <section class="page-section bg-slate-900" id="p6">
+        <h2 class="strat-title text-rose-500">06. 捆绑定价 (Bundling Pricing)</h2>
+        <div class="flex gap-20">
+            <div class="flex-1 glass-card p-12 bg-rose-950/20 rounded-3xl border border-rose-500/30">
+                <p class="text-3xl font-bold text-rose-400 mb-6">策略精髓：1 + 1 > 2</p>
+                <ul class="text-2xl space-y-6 list-disc ml-8 text-slate-300">
+                    <li>将具有互补性的产品打包</li>
+                    <li>总价比单独购买更具诱惑力</li>
+                    <li>促进关联产品的协同消费</li>
+                </ul>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+                <div class="bg-rose-500 p-10 rounded-2xl transform rotate-3 shadow-2xl">
+                    <div class="text-3xl text-rose-100 font-bold italic">超值套餐</div>
+                    <div class="text-5xl font-black mt-4">比单买便宜 30%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function go(index) {
+            document.getElementById('p' + index).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.page-section');
+            const dots = document.querySelectorAll('.dot');
+            let current = 0;
+
+            sections.forEach((section, i) => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 300) {
+                    current = i;
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.remove('active');
+                if (i === current) dot.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
