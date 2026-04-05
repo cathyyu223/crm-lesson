@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>说服客户策略 - 互动教学系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f1f5f9;
+            overflow: hidden;
+            font-size: 1.5rem;
+        }
+
+        .page {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+            padding: 3rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease-out;
+            overflow-y: auto;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            width: 95%;
+            max-width: 1200px;
+            padding: 3.5rem;
+            border-top: 12px solid #2563eb;
+        }
+
+        .option-btn {
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 4px solid #e2e8f0;
+            padding: 1.5rem 2rem;
+            border-radius: 1.5rem;
+            background: white;
+            margin-bottom: 1rem;
+            text-align: left;
+            width: 100%;
+            font-weight: 700;
+        }
+
+        .option-btn:hover {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            transform: translateX(10px);
+        }
+
+        .analysis-box {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 针对投影优化的大字号 */
+        .text-huge { font-size: 4.5rem; line-height: 1.1; font-weight: 900; }
+        .text-title { font-size: 2.8rem; font-weight: 900; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2rem;
+            padding: 1.2rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .correct { border-color: #22c55e !important; background-color: #f0fdf4 !important; color: #166534; }
+        .wrong { border-color: #ef4444 !important; background-color: #fef2f2 !important; color: #991b1b; }
+    </style>
+</head>
+<body>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-200 text-slate-700 hover:bg-slate-300" style="display:none">← 上一页</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-700">下一页 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page active bg-slate-900 text-white text-center">
+        <div class="mb-6 bg-blue-500 px-6 py-2 rounded-full text-xl font-bold inline-block">CRM 营销实战课程</div>
+        <h1 class="text-huge mb-10">说服客户策略<br><span class="text-blue-400">实战情境演练</span></h1>
+        <p class="text-3xl text-slate-400 max-w-4xl mx-auto leading-relaxed px-6">
+            根据不同类型的客户特征，选择最优的说服行动。<br>
+            <span class="text-blue-300 font-bold mt-8 block italic">—— 掌握沟通艺术，提升成交转化</span>
+        </p>
+    </section>
+
+    <!-- 题目容器由 JS 渲染 -->
+    <div id="quiz-pages"></div>
+
+    <!-- 结语页 -->
+    <section class="page bg-blue-900 text-white text-center">
+        <h2 class="text-huge mb-10 text-center">演练结束</h2>
+        <p class="text-3xl text-slate-300 max-w-4xl px-10">
+            说服的核心不在于改变对方，而在于通过<span class="text-blue-400 font-bold">精准的画像识别</span>，选择最顺应其心理的路径。
+        </p>
+        <button onclick="location.reload()" class="mt-16 bg-white text-blue-900 px-14 py-6 rounded-full text-2xl font-black hover:bg-slate-200 transition shadow-2xl">
+            重新开始演练
+        </button>
+    </section>
+
+    <script>
+        const quizData = [
+            {
+                type: "沉默寡言型",
+                scenario: "你正在介绍一款高端ERP系统，客户陈总全程几乎不说话，只是偶尔点头或盯着产品手册，你无法通过他的表情判断他的意图。此时你应该：",
+                options: [
+                    "继续滔滔不绝地介绍产品的技术细节，展示专业性",
+                    "停止单向陈述，设计一些开放性问题诱导他开口",
+                    "认为他不感兴趣，礼貌性地留下一份资料就离开"
+                ],
+                correct: 1,
+                features: "性格内向、城府深、不轻易表露情感。这种客户通常在思考，但由于没有互动，销售人员很容易失去节奏。",
+                difficulty: "信息极度不对称，销售员无法捕捉其真实需求点（Pain Points）。",
+                strategy: "【激发兴趣，诱导开口】。沉默型客户需要‘破冰’。不要急于推销，而是通过提问（如：您目前在流程管理中最头疼的是哪块？）来打破沉默，引导其说出顾虑。"
+            },
+            {
+                type: "犹豫不决型",
+                scenario: "李女士在看中一款理财产品后，反复询问‘真的没有风险吗？’、‘我想再看看其他家的再决定’。即便你解释了很久，她还是拿不定主意。此时最优策略是：",
+                options: [
+                    "尊重她的意愿，让她回家再考虑几天",
+                    "针对她的顾虑提供权威对比报告，并强调限时优惠即将结束",
+                    "告诉她这款产品其实不适合她，推荐更便宜的"
+                ],
+                correct: 1,
+                features: "缺乏主见、过度谨慎、害怕承担责任。他们对价值认可，但对‘失去’或‘选错’极度恐惧。",
+                difficulty: "客户陷入‘对比陷阱’，无法自行完成最后一步决策。",
+                strategy: "【消除顾虑，临门一脚】。这类客户需要‘安全感’和‘压力’。通过第三方背书（专家意见）消除疑虑，再通过紧迫感策略（如限时活动、名额有限）促使其快速成交。"
+            },
+            {
+                type: "傲慢自大/专家型",
+                scenario: "某科技公司技术总监张总在你演示时不断打断你，并指出‘你们这个架构已经落伍了’，试图展示他比你更专业。此时你应该：",
+                options: [
+                    "当场反驳他的错误观点，维护公司产品的尊严",
+                    "对他表现出的专业素养表示钦佩，请教他的看法，并顺着他的思路切入产品优势",
+                    "保持沉默，完全听从他的指挥进行演示"
+                ],
+                correct: 1,
+                features: "自尊心极强、爱表现、希望被尊重和认可。他们往往通过贬低别人来抬高自己。",
+                difficulty: "容易引发争论，一旦销售员表现得比他更‘懂’，就会引起他的反感甚至抵触心理。",
+                strategy: "【肯定价值，顺势而为】。不要与他争辩。通过满足其虚荣心（戴高帽），让他站在‘指导者’的高度，当他觉得被认可后，反而更容易接受你‘谦卑’递上的建议。"
+            },
+            {
+                type: "性急火爆型",
+                scenario: "刘总进门就说：‘我只有5分钟时间，你不用讲那么多废话，直接告诉我你们能比竞争对手便宜多少？能解决什么问题？’此时你应该：",
+                options: [
+                    "坚持按照标准PPT流程讲完，确保他能理解全局",
+                    "直接给出底价，然后快速概括3个核心利益点",
+                    "要求重新约一个他有空的时间再谈"
+                ],
+                correct: 1,
+                features: "效率至上、目标明确、缺乏耐性。他们讨厌冗长的铺垫，只关心结果和利益。",
+                difficulty: "销售员往往习惯于‘铺垫-推导-结论’，但这会让这类客户极度不耐烦并直接结束对话。",
+                strategy: "【直奔主题，利益先行】。摒弃所有繁文缛节。第一分钟就要说出核心价值（ROI），用结论导向的沟通方式抓住他的注意力，细节在后续确认中补充。"
+            },
+            {
+                type: "固执己见型",
+                scenario: "王老先生对某种老旧技术有强烈的情结，无论你怎么展示新技术的高效率，他都认为‘旧的才靠谱’，并对此深信不疑。此时你应该：",
+                options: [
+                    "告诉他旧技术已经被淘汰了，跟不上时代了",
+                    "避开直接冲突，利用客观行业数据和成功案例让他‘自己发现’新旧差异",
+                    "完全放弃说服，按照他的要求提供旧版方案"
+                ],
+                correct: 1,
+                features: "思想僵化、抗拒变化、相信经验。这类人很难被‘说服’，只能被‘引导’。",
+                difficulty: "直接挑战他的观点会被视为对他人格的挑战，导致沟通大门关闭。",
+                strategy: "【摆出事实，侧面引导】。不要试图在口头上赢过他。通过第三方的客观事实（如：同行的效率对比数据）和成功转型的案例，让他自己产生对比心理，从而产生‘自发性’的转变。"
+            }
+        ];
+
+        let currentPage = 0;
+        const totalPages = quizData.length + 2; // 封面 + 题目 + 结语
+
+        function renderQuizzes() {
+            const container = document.getElementById('quiz-pages');
+            quizData.forEach((data, index) => {
+                const section = document.createElement('section');
+                section.className = `page ${index + 1 === currentPage ? 'active' : ''}`;
+                section.id = `page-${index + 1}`;
+                
+                section.innerHTML = `
+                    <div class="quiz-card">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="bg-blue-100 text-blue-700 px-6 py-2 rounded-full font-black text-xl uppercase tracking-widest">情境演练 #${index + 1}</span>
+                            <span class="text-slate-400 font-bold">目标客户：${data.type}</span>
+                        </div>
+                        <h2 class="text-title text-slate-800 mb-10 leading-snug">${data.scenario}</h2>
+                        
+                        <div class="options-container space-y-4">
+                            ${data.options.map((opt, i) => `
+                                <button class="option-btn text-body" onclick="checkAnswer(this, ${index}, ${i})">${opt}</button>
+                            `).join('')}
+                        </div>
+
+                        <div id="analysis-${index}" class="analysis-box">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-slate-50 p-6 rounded-xl border-t-4 border-slate-300">
+                                    <h4 class="font-black text-slate-700 mb-2">👤 客户特征</h4>
+                                    <p class="text-lg text-slate-600">${data.features}</p>
+                                </div>
+                                <div class="bg-red-50 p-6 rounded-xl border-t-4 border-red-300">
+                                    <h4 class="font-black text-red-700 mb-2">⚠️ 说服难点</h4>
+                                    <p class="text-lg text-slate-600">${data.difficulty}</p>
+                                </div>
+                                <div class="bg-green-50 p-6 rounded-xl border-t-4 border-green-300">
+                                    <h4 class="font-black text-green-700 mb-2">🚀 核心策略</h4>
+                                    <p class="text-lg text-slate-600">${data.strategy}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+        }
+
+        function changePage(delta) {
+            const allPages = document.querySelectorAll('.page');
+            allPages[currentPage].classList.remove('active');
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= allPages.length) currentPage = allPages.length - 1;
+            allPages[currentPage].classList.add('active');
+            
+            // UI 状态控制
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').innerText = currentPage === allPages.length - 1 ? '结束' : '下一页 →';
+            if (currentPage === allPages.length - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+            } else {
+                document.getElementById('nextBtn').style.display = 'block';
+            }
+        }
+
+        function checkAnswer(btn, quizIdx, optIdx) {
+            const data = quizData[quizIdx];
+            const parent = btn.parentElement;
+            
+            if (parent.dataset.answered) return;
+            parent.dataset.answered = "true";
+
+            const options = parent.querySelectorAll('.option-btn');
+            options.forEach((opt, i) => {
+                if (i === data.correct) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += " ✨ (最优行动)";
+                } else if (i === optIdx) {
+                    opt.classList.add('wrong');
+                    opt.innerHTML += " ❌";
+                }
+            });
+
+            const analysis = document.getElementById(`analysis-${quizIdx}`);
+            analysis.style.display = 'block';
+        }
+
+        window.onload = () => {
+            renderQuizzes();
+        };
+
+        // 键盘翻页支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changePage(1);
+            if (e.key === 'ArrowLeft') changePage(-1);
+        });
+    </script>
+</body>
+</html>
