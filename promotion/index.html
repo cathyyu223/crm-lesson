@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品与服务促销策略 - 互动教学</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            scroll-behavior: smooth;
+        }
+
+        .section-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 投影优化字号 */
+        .title-hero { font-size: 6rem; font-weight: 900; line-height: 1.1; }
+        .title-main { font-size: 4.5rem; font-weight: 700; margin-bottom: 2rem; color: #38bdf8; }
+        .text-content { font-size: 2.2rem; line-height: 1.6; color: #cbd5e1; }
+        .text-sub { font-size: 1.8rem; color: #94a3b8; }
+
+        .info-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-left: 10px solid #38bdf8;
+            padding: 2.5rem;
+            border-radius: 0 1.5rem 1.5rem 0;
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateX(10px);
+            background: rgba(51, 65, 85, 0.8);
+        }
+
+        .dot-nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 100;
+        }
+        .dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #475569;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot.active { background: #38bdf8; transform: scale(1.5); box-shadow: 0 0 15px #38bdf8; }
+
+        .tag {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: #1e293b;
+            border: 1px solid #38bdf8;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 侧边导航 -->
+    <nav class="dot-nav">
+        <div class="dot active" onclick="go(0)"></div>
+        <div class="dot" onclick="go(1)"></div>
+        <div class="dot" onclick="go(2)"></div>
+        <div class="dot" onclick="go(3)"></div>
+        <div class="dot" onclick="go(4)"></div>
+    </nav>
+
+    <!-- 1. 封面 -->
+    <section class="section-page text-center" id="s0">
+        <h1 class="title-hero mb-8">产品与服务<br><span class="text-sky-400">促销策略全解析</span></h1>
+        <p class="text-4xl text-slate-400 italic mb-12">传播信息 · 引起注意 · 建立沟通</p>
+        <div class="flex justify-center gap-6">
+            <button onclick="go(1)" class="bg-sky-600 hover:bg-sky-500 px-12 py-6 rounded-2xl text-3xl font-bold transition-all">开启教学演示</button>
+        </div>
+    </section>
+
+    <!-- 2. 广告 -->
+    <section class="section-page" id="s1">
+        <h2 class="title-main">📊 01. 广告 (Advertising)</h2>
+        <p class="text-content mb-8">“广而告之”：通过传播媒介，让客户<span class="text-yellow-400">了解并吸引购买</span>。</p>
+        
+        <div class="grid grid-cols-3 gap-8">
+            <div class="info-card">
+                <h3 class="text-3xl font-bold mb-4 text-sky-400">按媒介分类</h3>
+                <p class="text-sub">印刷、电视、广播、网络<br><span class="text-sm italic">（影响覆盖面、速度与成本）</span></p>
+            </div>
+            <div class="info-card">
+                <h3 class="text-3xl font-bold mb-4 text-sky-400">按区域分类</h3>
+                <p class="text-sub">国际性、全国性、地区性<br><span class="text-sm italic">（区域越大，成本越高）</span></p>
+            </div>
+            <div class="info-card">
+                <h3 class="text-3xl font-bold mb-4 text-sky-400">按内容分类</h3>
+                <p class="text-sub">产品广告、服务广告、品牌广告</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 公共关系 -->
+    <section class="section-page bg-slate-900" id="s2">
+        <h2 class="title-main" style="color: #4ade80;">🤝 02. 公共关系 (Public Relations)</h2>
+        <p class="text-content mb-10">利用交际技巧与公关活动，<span class="text-green-400">树立并维护企业形象</span>。</p>
+        
+        <div class="space-y-6">
+            <div class="flex items-start gap-8 p-8 bg-slate-800 rounded-2xl border-l-8 border-green-500">
+                <div class="text-5xl">🛠️</div>
+                <div>
+                    <h4 class="text-3xl font-bold mb-2">服务性公关</h4>
+                    <p class="text-content text-2xl">以服务为媒介。如：汽车中心<span class="text-green-400 font-bold">免费检测</span>，增加忠诚度。</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-8 p-8 bg-slate-800 rounded-2xl border-l-8 border-green-500">
+                <div class="text-5xl">❤️</div>
+                <div>
+                    <h4 class="text-3xl font-bold mb-2">公益性公关</h4>
+                    <p class="text-content text-2xl">关注公共利益。如：灾区<span class="text-green-400 font-bold">捐款捐物</span>，体现社会担当。</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-8 p-8 bg-slate-800 rounded-2xl border-l-8 border-green-500">
+                <div class="text-5xl">📢</div>
+                <div>
+                    <h4 class="text-3xl font-bold mb-2">宣传性公关</h4>
+                    <p class="text-content text-2xl">开展公共活动。如：蒙牛邀请客户<span class="text-green-400 font-bold">参观奶源地</span>，增强品质认同。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 销售促进 -->
+    <section class="section-page" id="s3">
+        <h2 class="title-main" style="color: #fbbf24;">⚡ 03. 销售促进 (Sales Promotion)</h2>
+        <p class="text-content mb-10">利用<span class="text-amber-400 font-bold">短期诱因</span>，直接刺激客户购买行为。</p>
+        
+        <div class="grid grid-cols-2 gap-10">
+            <div class="bg-amber-900/20 p-8 rounded-3xl border border-amber-500/30">
+                <div class="text-3xl font-bold mb-4 text-amber-400">🎁 免费类</div>
+                <ul class="text-2xl space-y-4">
+                    <li>• <b>免费试用：</b>试吃、小样、免费阅读。</li>
+                    <li>• <b>免费服务：</b>送货上门、7天无理由退换。</li>
+                </ul>
+            </div>
+            <div class="bg-amber-900/20 p-8 rounded-3xl border border-amber-500/30">
+                <div class="text-3xl font-bold mb-4 text-amber-400">🎟️ 奖励类</div>
+                <ul class="text-2xl space-y-4">
+                    <li>• <b>优惠券：</b>电子或纸质凭证，限时消费。</li>
+                    <li>• <b>奖金/礼品：</b>里程奖励、京东京豆积分系统。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 总结页 -->
+    <section class="section-page items-center text-center bg-slate-900" id="s4">
+        <h2 class="title-main text-white">🎓 课堂教学小结</h2>
+        <div class="glass-card max-w-4xl text-left border-sky-400">
+            <p class="text-content mb-6">1. <b>广告</b>是长期告知与吸引的基础。</p>
+            <p class="text-content mb-6">2. <b>公关</b>是品牌温度与形象的护城河。</p>
+            <p class="text-content">3. <b>销售促进</b>是达成短期销量目标的“强心剂”。</p>
+        </div>
+        <button onclick="go(0)" class="mt-12 text-2xl text-slate-500 hover:text-white transition-all">返回首页重新演示</button>
+    </section>
+
+    <script>
+        function go(index) {
+            document.getElementById('s' + index).scrollIntoView({ behavior: 'smooth' });
+            updateDots(index);
+        }
+
+        function updateDots(index) {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        // 监听滚动自动更新点
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section-page');
+            let current = 0;
+            sections.forEach((section, i) => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 300) {
+                    current = i;
+                }
+            });
+            updateDots(current);
+        });
+    </script>
+</body>
+</html>
