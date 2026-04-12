@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子发票业务流程 - 交互式教学系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 页面容器 */
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 4rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex;
+            animation: slideFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideFade {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* 视觉意象卡片 */
+        .visual-container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 3rem;
+            padding: 3rem;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        /* 投影优化字号 */
+        .text-hero { font-size: clamp(3rem, 10vw, 6.5rem); font-weight: 900; line-height: 1.1; }
+        .text-step { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; color: #38bdf8; margin-bottom: 1.5rem; }
+        .text-desc { font-size: 2rem; line-height: 1.6; color: #cbd5e1; }
+
+        .quiz-box {
+            background: #1e293b;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            width: 100%;
+            max-width: 1000px;
+            border-top: 8px solid #38bdf8;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 1.5rem 2rem;
+            margin-top: 1rem;
+            background: #334155;
+            border: 3px solid transparent;
+            border-radius: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover { background: #475569; border-color: #38bdf8; transform: translateX(10px); }
+        .option-btn.correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .option-btn.wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        /* 导航 */
+        .nav-btn {
+            position: fixed;
+            bottom: 3rem;
+            padding: 1.2rem 3rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.8rem;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .step-indicator {
+            position: fixed;
+            top: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+        .dot { width: 15px; height: 15px; border-radius: 50%; background: #334155; transition: 0.3s; }
+        .dot.active { background: #38bdf8; transform: scale(1.5); box-shadow: 0 0 15px #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <!-- 进度点 -->
+    <div class="step-indicator" id="dots"></div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500 shadow-2xl shadow-blue-900/40">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active flex items-center justify-center text-center" id="p0">
+        <div class="animate-pulse mb-8">
+            <svg class="w-32 h-32 text-blue-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        </div>
+        <h1 class="text-hero mb-10">电子发票<br><span class="text-blue-400">数字化业务流程</span></h1>
+        <p class="text-3xl text-slate-400 max-w-3xl leading-relaxed">不再是冰冷的表格，让我们跟随一张电子发票，开启它的数字旅程。</p>
+        <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-6 rounded-full text-2xl font-black transition-transform hover:scale-110">点击出发</button>
+    </section>
+
+    <!-- 1. 领购与系统准备 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-step">第一站：数字工厂的准入 (领购)</h2>
+        <div class="visual-container">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <p class="text-desc mb-6">企业首先需要在税务系统完成<span class="text-blue-400 font-bold">在线领购</span>。这相当于在数字工厂里预定了生产定额。</p>
+                    <ul class="text-2xl space-y-4 text-slate-300">
+                        <li>✅ 无需跑税务局柜台</li>
+                        <li>✅ 实时申请，额度立等可取</li>
+                        <li>✅ 系统自动核定票种</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800/80 p-6 rounded-3xl text-center border border-slate-700">
+                    
+                    <p class="text-lg mt-4 text-slate-500 italic">“点击领购，数字定额即刻同步”</p>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-box">
+            <p class="text-3xl font-black mb-6 text-sky-300">【实操场景】企业想开票但发现没有额度了，应该：</p>
+            <button class="option-btn" onclick="checkAnswer(this, false)">A. 携带证件去税务局排队申领纸质发票</button>
+            <button class="option-btn" onclick="checkAnswer(this, true)">B. 通过电子发票服务平台在线提交领购申请</button>
+            <div class="feedback mt-6 p-6 rounded-2xl text-2xl font-bold hidden"></div>
+        </div>
+    </section>
+
+    <!-- 2. 开具与电子签章 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-step">第二站：数字身份证的生成 (开具)</h2>
+        <div class="visual-container">
+            <div class="text-desc mb-8">
+                开具时，系统会自动附加<span class="text-yellow-400 font-bold">电子签章</span>。这是电子发票的“灵魂”，具有唯一性和不可抵赖性。
+            </div>
+            <div class="flex flex-wrap gap-6 justify-center">
+                <div class="bg-blue-900/30 p-8 rounded-3xl border border-blue-500/30 w-full md:w-80 text-center">
+                    <span class="text-5xl block mb-4">🖥️</span>
+                    <p class="font-bold text-2xl">在线开具</p>
+                    <p class="text-lg text-slate-400">填入业务数据</p>
+                </div>
+                <div class="flex items-center text-4xl text-blue-500">➜</div>
+                <div class="bg-blue-900/30 p-8 rounded-3xl border border-blue-500/30 w-full md:w-80 text-center">
+                    <span class="text-5xl block mb-4">🔐</span>
+                    <p class="font-bold text-2xl">电子签章</p>
+                    <p class="text-lg text-slate-400">数据脱敏、加密加封</p>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-box">
+            <p class="text-3xl font-black mb-6 text-sky-300">【实操场景】为什么电子发票不需要像纸质发票那样盖物理章？</p>
+            <button class="option-btn" onclick="checkAnswer(this, true)">A. 因为电子签章包含了防伪信息，具有法律效力</button>
+            <button class="option-btn" onclick="checkAnswer(this, false)">B. 因为打印出来后再手盖章太麻烦，税务局不管了</button>
+            <div class="feedback mt-6 p-6 rounded-2xl text-2xl font-bold hidden"></div>
+        </div>
+    </section>
+
+    <!-- 3. 传递与接收 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-step">第三站：零成本的瞬时移动 (传递)</h2>
+        <div class="visual-container">
+            <p class="text-desc mb-10 text-center">发票生成后，通过网络、移动通信或邮件秒级到达客户手中。</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="p-6 bg-slate-800 rounded-2xl border-b-4 border-blue-500">
+                    <span class="text-5xl">📧</span>
+                    <p class="text-2xl font-bold mt-4">电子邮箱</p>
+                </div>
+                <div class="p-6 bg-slate-800 rounded-2xl border-b-4 border-green-500">
+                    <span class="text-5xl">💬</span>
+                    <p class="text-2xl font-bold mt-4">微信/支付宝卡包</p>
+                </div>
+                <div class="p-6 bg-slate-800 rounded-2xl border-b-4 border-purple-500">
+                    <span class="text-5xl">📲</span>
+                    <p class="text-2xl font-bold mt-4">企业自建App/短信</p>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-box">
+            <p class="text-3xl font-black mb-6 text-sky-300">【实操场景】消费者在微信支付后，最快捷的开票流程是：</p>
+            <button class="option-btn" onclick="checkAnswer(this, true)">A. 支付成功后点击“开发票”，直接存入微信卡包</button>
+            <button class="option-btn" onclick="checkAnswer(this, false)">B. 截图支付界面，打印出来找商家换纸质票</button>
+            <div class="feedback mt-6 p-6 rounded-2xl text-2xl font-bold hidden"></div>
+        </div>
+    </section>
+
+    <!-- 4. 查验与归档 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-step">第四站：数字档案的永恒 (查验归档)</h2>
+        <div class="visual-container">
+            <div class="space-y-8">
+                <div class="flex items-start gap-6 bg-slate-800/50 p-6 rounded-2xl">
+                    <div class="bg-blue-600 p-3 rounded-lg text-3xl">🔍</div>
+                    <div>
+                        <h4 class="text-3xl font-bold">在线查验</h4>
+                        <p class="text-xl text-slate-400">通过税务机关查验平台，输入发票代码、号码、金额即可鉴别真伪。</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6 bg-slate-800/50 p-6 rounded-2xl">
+                    <div class="bg-emerald-600 p-3 rounded-lg text-3xl">🗄️</div>
+                    <div>
+                        <h4 class="text-3xl font-bold">数字归档</h4>
+                        <p class="text-xl text-slate-400">发票以原件电子档入账归档，无须打印，节能环保且防丢失。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-box">
+            <p class="text-3xl font-black mb-6 text-sky-300">【实操场景】收到电子发票入账后，电子档原件应该：</p>
+            <button class="option-btn" onclick="checkAnswer(this, true)">A. 按照电子会计档案管理要求妥善保存，不用强行打印</button>
+            <button class="option-btn" onclick="checkAnswer(this, false)">B. 删掉电子档，只保留打印出来的纸质版本就行</button>
+            <div class="feedback mt-6 p-6 rounded-2xl text-2xl font-bold hidden"></div>
+        </div>
+    </section>
+
+    <!-- 5. 总结回顾 -->
+    <section class="page-section page-hero text-center" id="p5">
+        <h2 class="text-hero mb-12">流程总结</h2>
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+            <div class="bg-blue-900/20 p-8 rounded-3xl border border-blue-500/30">
+                <h4 class="text-3xl font-bold mb-4 text-blue-400">业务链条</h4>
+                <p class="text-2xl text-slate-300">领购 → 开具 → 传递 → 接收 → 查验 → 归档</p>
+            </div>
+            <div class="bg-emerald-900/20 p-8 rounded-3xl border border-emerald-500/30">
+                <h4 class="text-3xl font-bold mb-4 text-emerald-400">核心优势</h4>
+                <p class="text-2xl text-slate-300">零成本、零开发、零难度、无接触、全闭环</p>
+            </div>
+        </div>
+        <button onclick="location.reload()" class="mt-16 text-2xl text-slate-500 hover:text-white transition-all underline underline-offset-8">重新体验旅程</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const pages = document.querySelectorAll('.page-section');
+        const dotsContainer = document.getElementById('dots');
+
+        // 初始化指示点
+        pages.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dot.onclick = () => {
+                const diff = i - currentPage;
+                changePage(diff);
+            };
+            dotsContainer.appendChild(dot);
+        });
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === pages.length - 1 ? 'none' : 'block';
+            
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentPage);
+            });
+        }
+
+        function changePage(delta) {
+            pages[currentPage].classList.remove('active');
+            currentPage += delta;
+            
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= pages.length) currentPage = pages.length - 1;
+            
+            pages[currentPage].classList.add('active');
+            pages[currentPage].scrollTop = 0;
+            updateUI();
+        }
+
+        function checkAnswer(btn, isCorrect) {
+            const container = btn.parentElement;
+            const feedback = container.querySelector('.feedback');
+            
+            // 防止重复点击
+            if (container.dataset.answered) return;
+            container.dataset.answered = "true";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerHTML = "✨ 回答正确！精准掌握业务要点。";
+                feedback.className = "feedback mt-6 p-6 rounded-2xl text-2xl font-bold bg-green-900/40 text-green-400 block animate-bounce";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerHTML = "❌ 答错了。电子发票最大的特点就是流程数字化、自动化。";
+                feedback.className = "feedback mt-6 p-6 rounded-2xl text-2xl font-bold bg-red-900/40 text-red-400 block";
+            }
+        }
+
+        window.onload = updateUI;
+
+        // 键盘控制
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changePage(1);
+            if (e.key === 'ArrowLeft') changePage(-1);
+        });
+    </script>
+</body>
+</html>
