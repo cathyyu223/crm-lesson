@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发票概述：概念与分类 - 互动教学</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden; /* 禁止 body 滚动，由 page 容器处理 */
+        }
+
+        /* 页面容器：支持独立滚动 */
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 3rem 2rem 10rem 2rem; /* 底部留出 10rem 确保不被按钮遮挡 */
+            flex-direction: column;
+            justify-content: flex-start; /* 从顶部开始排列 */
+            align-items: center;
+            overflow-y: auto; /* 开启纵向滚动 */
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
+        }
+
+        .page-section.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* 封面专门居中 */
+        .page-hero {
+            justify-content: center !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 投影优化字号 */
+        .title-hero { font-size: clamp(3rem, 10vw, 5.5rem); font-weight: 900; line-height: 1.1; }
+        .title-sub { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; color: #38bdf8; margin-bottom: 2rem; width: 100%; max-width: 1000px; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; color: #cbd5e1; }
+
+        .knowledge-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-left: 10px solid #38bdf8;
+            padding: 2.5rem;
+            border-radius: 0 1.5rem 1.5rem 0;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .quiz-container {
+            background: #1e293b;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid #334155;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 1.2rem 2rem;
+            margin-top: 1rem;
+            background: #334155;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            font-size: 1.6rem;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover { background: #475569; border-color: #38bdf8; }
+        .option-btn.correct { background: #064e3b !important; border-color: #10b981 !important; color: #ecfdf5; }
+        .option-btn.wrong { background: #7f1d1d !important; border-color: #ef4444 !important; color: #fef2f2; }
+
+        /* 导航按钮固定在最前方 */
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* 自定义滚动条样式 */
+        .page-section::-webkit-scrollbar { width: 10px; }
+        .page-section::-webkit-scrollbar-track { background: transparent; }
+        .page-section::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-700 text-slate-300 hover:bg-slate-600">← 上一页</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-700">下一页 →</button>
+
+    <section class="page-section page-hero active text-center" id="p0">
+        <h1 class="title-hero mb-8">发票概述：<br><span class="text-sky-400">概念与分类</span></h1>
+        <p class="text-3xl text-slate-400 italic mb-12">—— 4.1 纸质发票与电子发票概述 ——</p>
+        <button onclick="changePage(1)" class="bg-sky-600 hover:bg-sky-500 px-12 py-5 rounded-2xl text-2xl font-black transition-all shadow-xl">进入课程</button>
+    </section>
+
+    <section class="page-section" id="p1">
+        <h2 class="title-sub">01 发票的概念</h2>
+        <div class="knowledge-card">
+            <p class="text-body mb-4">发票是指在<span class="text-yellow-400 font-bold">购销商品、提供或者接受服务以及从事其他经营活动</span>中，开具、收取的<span class="text-yellow-400 font-bold">业务凭证</span>。</p>
+            <ul class="text-body list-disc ml-8 space-y-2 text-slate-400">
+                <li>会计核算的原始凭证</li>
+                <li>税务稽查的重要依据</li>
+                <li>维护消费者权益的法律凭证</li>
+            </ul>
+        </div>
+
+        <div class="quiz-container">
+            <p class="text-2xl font-black mb-4 text-sky-300">【测试题】下列说法错误的是：</p>
+            <button class="option-btn" onclick="checkAnswer(this, false, '发票确为原始凭证。')">A. 发票是会计核算的原始凭证</button>
+            <button class="option-btn" onclick="checkAnswer(this, true, '发票涵盖购销、服务等多种经营活动，不仅限于实物商品。')">B. 发票仅在购买实物商品时才开具</button>
+            <button class="option-btn" onclick="checkAnswer(this, false, '发票是控管税源的重要手段。')">C. 发票是税务稽查的重要依据</button>
+            <div class="feedback mt-6 p-4 rounded-xl text-xl font-bold hidden"></div>
+        </div>
+    </section>
+
+    <section class="page-section" id="p2">
+        <h2 class="title-sub">02 发票的分类</h2>
+        <div class="knowledge-card">
+            <h3 class="text-2xl font-bold text-white mb-4">核心分类标准：</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                    <p class="text-blue-400 font-bold mb-2 text-xl">按管理要求：</p>
+                    <p class="text-lg">● 增值税专用发票<br>● 增值税普通发票</p>
+                </div>
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                    <p class="text-amber-400 font-bold mb-2 text-xl">按发票形态：</p>
+                    <p class="text-lg">● 纸质发票<br>● 电子发票</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <p class="text-2xl font-black mb-4 text-sky-300">【测试题】按照“发票形态”分类，包括：</p>
+            <button class="option-btn" onclick="checkAnswer(this, false)">A. 增值税专用发票</button>
+            <button class="option-btn" onclick="checkAnswer(this, true)">B. 纸质发票</button>
+            <button class="option-btn" onclick="checkAnswer(this, true)">C. 电子发票</button>
+            <div class="feedback mt-6 p-4 rounded-xl text-xl font-bold hidden"></div>
+        </div>
+    </section>
+
+    <section class="page-section page-hero text-center" id="p3">
+        <h2 class="title-sub text-white">教学小结</h2>
+        <div class="knowledge-card text-left mx-auto border-l-green-500">
+            <p class="text-2xl mb-4">✅ <b>发票：</b>法定的收付款业务凭证。</p>
+            <p class="text-2xl mb-4">✅ <b>职能：</b>会计核算、税务稽查、权益维护。</p>
+            <p class="text-2xl">✅ <b>分类：</b>管理看“专/普”，形态看“纸/电”。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-12 text-xl text-slate-500 hover:text-white">重新开始</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const pages = document.querySelectorAll('.page-section');
+
+        function updateNav() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === pages.length - 1 ? 'none' : 'block';
+        }
+
+        function changePage(delta) {
+            pages[currentPage].classList.remove('active');
+            currentPage += delta;
+            
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= pages.length) currentPage = pages.length - 1;
+            
+            pages[currentPage].classList.add('active');
+            pages[currentPage].scrollTop = 0; // 切换页面时回到顶部
+            updateNav();
+        }
+
+        function checkAnswer(btn, isCorrect, explanation = '') {
+            const container = btn.parentElement;
+            const feedback = container.querySelector('.feedback');
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerHTML = explanation ? `✨ 正确！${explanation}` : "✨ 正确！";
+                feedback.className = "feedback mt-6 p-4 rounded-xl text-xl font-bold bg-green-900/50 text-green-400 block";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerHTML = explanation ? `❌ 错误。${explanation}` : "❌ 错误，请再试一次。";
+                feedback.className = "feedback mt-6 p-4 rounded-xl text-xl font-bold bg-red-900/50 text-red-400 block";
+            }
+        }
+
+        window.onload = updateNav;
+
+        // 键盘控制
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changePage(1);
+            if (e.key === 'ArrowLeft') changePage(-1);
+        });
+    </script>
+</body>
+</html>
