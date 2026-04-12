@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发票的开具与使用 - 互动教学系统</title>
+    <!-- 使用 Tailwind CSS 加速样式构建 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 分页容器 */
+        .page-container {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-container.active {
+            display: flex;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 投影优化字号 */
+        .text-huge { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1.1; }
+        .text-title { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; color: #cbd5e1; }
+
+        .info-card {
+            background: rgba(30, 41, 59, 0.5);
+            border-left: 10px solid #3b82f6;
+            padding: 2rem;
+            border-radius: 0 1.5rem 1.5rem 0;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        /* 互动题目样式 */
+        .quiz-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid #334155;
+            background: #1e293b;
+            padding: 1.5rem;
+            border-radius: 1.2rem;
+            font-size: 1.6rem;
+            font-weight: 600;
+            text-align: left;
+            width: 100%;
+        }
+
+        .quiz-option:hover {
+            border-color: #3b82f6;
+            background: #0f172a;
+        }
+
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        /* 导航按钮 */
+        .nav-btn {
+            position: fixed;
+            bottom: 3rem;
+            padding: 1.2rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            z-index: 1000;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        /* 隐藏滚动条但保留功能 */
+        .page-container::-webkit-scrollbar { width: 0px; }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部进度条 -->
+    <div class="fixed top-0 left-0 w-full h-2 bg-slate-900 z-[1001]">
+        <div id="progressBar" class="h-full bg-blue-500 transition-all duration-500" style="width: 20%"></div>
+    </div>
+
+    <!-- 导航 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一页</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一页 →</button>
+
+    <!-- 页面 0: 封面 -->
+    <section class="page-container active" id="page0">
+        <div class="text-center">
+            <div class="mb-8">
+                <svg class="w-32 h-32 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h1 class="text-huge mb-6">发票的开具与使用</h1>
+            <p class="text-3xl text-slate-400 font-bold mb-10 italic">规范财务流程 · 维护税务合规</p>
+            <div class="bg-slate-900/50 p-8 rounded-3xl border border-slate-800 max-w-2xl mx-auto">
+                <p class="text-2xl text-slate-300">探讨发票从开具到流转再到保管的全生命周期规范。</p>
+            </div>
+            <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-6 rounded-full text-2xl font-black transition-transform hover:scale-110">开始学习</button>
+        </div>
+    </section>
+
+    <!-- 页面 1: 开具要求 -->
+    <section class="page-container" id="page1">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-title">一、发票的开具要求</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">基本原则</h3>
+                    <p class="text-xl">业务收取款项，应由收款方开具发票。</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">内容完整</h3>
+                    <p class="text-xl">字迹清楚，全部联次一次复写，内容真实。</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">印章规范</h3>
+                    <p class="text-xl">必须加盖单位的【发票专用章】。</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">语言币种</h3>
+                    <p class="text-xl">应当使用中文，金额单位为人民币。</p>
+                </div>
+            </div>
+
+            <!-- 题目 -->
+            <div class="bg-slate-800/50 p-8 rounded-3xl border border-slate-700">
+                <p class="text-2xl font-bold mb-6">【互动】企业销售商品收到款项，应由谁负责开具发票？</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz1">
+                    <button class="quiz-option" onclick="checkAnswer(this, false, 'q1')">A. 购买方（支付方）</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, true, 'q1')">B. 销售方（收款方）</button>
+                </div>
+                <p id="feedback-q1" class="mt-6 text-xl font-bold hidden"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页面 2: 使用与保管 -->
+    <section class="page-container" id="page2">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-title">二、发票的使用与保管</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">领购制度</h3>
+                    <p class="text-xl">凭领购簿向主管税务机关领购发票。</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">保管期限</h3>
+                    <p class="text-xl">发票存根联和发票登记簿，应当保存【5年】。</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">丢失报告</h3>
+                    <p class="text-xl">丢失应当于发现当日书面报告税务机关。</p>
+                </div>
+                <div class="info-card">
+                    <h3 class="text-2xl font-black text-blue-400 mb-2 uppercase">跨区限制</h3>
+                    <p class="text-xl">不得跨规定的使用区域携带空白发票。</p>
+                </div>
+            </div>
+
+            <!-- 题目 -->
+            <div class="bg-slate-800/50 p-8 rounded-3xl border border-slate-700">
+                <p class="text-2xl font-bold mb-6">【互动】已开具的发票存根联应当保存多长时间？</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz2">
+                    <button class="quiz-option" onclick="checkAnswer(this, false, 'q2')">A. 3 年</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, true, 'q2')">B. 5 年</button>
+                </div>
+                <p id="feedback-q2" class="mt-6 text-xl font-bold hidden"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页面 3: 禁止行为 -->
+    <section class="page-container" id="page3">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-title text-red-500">三、发票管理的禁止行为</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <div class="info-card border-red-500">
+                    <h3 class="text-2xl font-black text-red-400 mb-2 uppercase">严禁虚开</h3>
+                    <p class="text-xl">不得开具与实际经营业务不符的发票。</p>
+                </div>
+                <div class="info-card border-red-500">
+                    <h3 class="text-2xl font-black text-red-400 mb-2 uppercase">严禁转借</h3>
+                    <p class="text-xl">不得转借、转让、代开发票。</p>
+                </div>
+                <div class="info-card border-red-500">
+                    <h3 class="text-2xl font-black text-red-400 mb-2 uppercase">严禁买卖</h3>
+                    <p class="text-xl">禁止私自印制、伪造、变造、倒卖发票。</p>
+                </div>
+                <div class="info-card border-red-500">
+                    <h3 class="text-2xl font-black text-red-400 mb-2 uppercase">严禁拆本</h3>
+                    <p class="text-xl">不得拆本使用或自行扩大使用范围。</p>
+                </div>
+            </div>
+
+            <!-- 题目 -->
+            <div class="bg-slate-800/50 p-8 rounded-3xl border border-slate-700">
+                <p class="text-2xl font-bold mb-6">【互动】下列哪项行为是发票管理规定中严厉禁止的？</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz3">
+                    <button class="quiz-option" onclick="checkAnswer(this, true, 'q3')">A. 将多余发票借给关联企业使用</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, false, 'q3')">B. 在民族自治地使用民族文字开票</button>
+                </div>
+                <p id="feedback-q3" class="mt-6 text-xl font-bold hidden"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页面 4: 总结 -->
+    <section class="page-container" id="page4">
+        <div class="text-center">
+            <h2 class="text-huge text-blue-400 mb-12">本章知识总结</h2>
+            <div class="space-y-6 max-w-4xl mx-auto text-left">
+                <div class="flex gap-6 items-start bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
+                    <span class="text-3xl">✅</span>
+                    <p class="text-2xl">开具：谁收款谁开票，必须真实完整，加盖专用章。</p>
+                </div>
+                <div class="flex gap-6 items-start bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
+                    <span class="text-3xl">✅</span>
+                    <p class="text-2xl">保管：存根联保存 5 年，丢失须当日书面报告。</p>
+                </div>
+                <div class="flex gap-6 items-start bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
+                    <span class="text-3xl">✅</span>
+                    <p class="text-2xl">红线：严禁虚开、转借、买卖、拆本。</p>
+                </div>
+            </div>
+            <button onclick="changePage(-4)" class="mt-16 bg-slate-800 text-white px-10 py-4 rounded-full text-xl font-bold">重新学习</button>
+        </div>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 5;
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('page' + currentPage);
+            currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('page' + currentPage);
+            nextEl.classList.add('active');
+            nextEl.scrollTop = 0;
+
+            // 更新 UI
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            document.getElementById('progressBar').style.width = ((currentPage + 1) / totalPages * 100) + '%';
+        }
+
+        function checkAnswer(btn, isCorrect, quizId) {
+            const container = btn.parentElement;
+            // 防止重复作答
+            if (container.dataset.answered) return;
+            container.dataset.answered = "true";
+
+            const feedback = document.getElementById('feedback-' + quizId);
+            feedback.classList.remove('hidden');
+
+            const options = container.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.style.opacity = "0.5";
+            });
+            btn.style.opacity = "1";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerHTML = "✨ 回答正确！精准掌握知识要点。";
+                feedback.className = "mt-6 text-xl font-bold text-emerald-400 block";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerHTML = "❌ 回答错误。请参考《发票管理办法》中的相关规范。";
+                feedback.className = "mt-6 text-xl font-bold text-rose-400 block";
+            }
+        }
+
+        // 键盘翻页支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changePage(1);
+            if (e.key === 'ArrowLeft') changePage(-1);
+        });
+    </script>
+</body>
+</html>
