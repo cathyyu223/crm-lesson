@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个保法：数字化时代的隐私盾牌</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 核心页面容器 */
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(1.02); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .text-huge { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; line-height: 1.1; text-align: center; }
+        .text-title { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+        .text-body { font-size: 1.5rem; line-height: 1.6; color: #cbd5e1; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        .law-highlight {
+            border-left: 6px solid #10b981;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: rgba(16, 185, 129, 0.05);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-radius: 0 1rem 1rem 0;
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        /* 题目样式 */
+        .quiz-container {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38bdf8;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem;
+            margin: 0.8rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            font-size: 1.4rem;
+        }
+
+        .quiz-option:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .feedback-box { margin-top: 1.5rem; padding: 1.5rem; border-radius: 1rem; font-weight: bold; font-size: 1.2rem; display: none; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .progress-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; }
+        .progress-dot.active { background: #38bdf8; box-shadow: 0 0 10px #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <!-- 进度指示 -->
+    <div class="fixed top-6 left-1/2 -translate-x-1/2 flex gap-3 z-[10001]" id="dotBar"></div>
+
+    <!-- 导航 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一页</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center" id="p0">
+        <h1 class="text-huge mb-6">《个人信息保护法》</h1>
+        <h2 class="text-3xl font-bold text-emerald-400 mb-10 italic">数字文明的法治基石</h2>
+        <div class="glass-card text-center">
+            <p class="text-xl text-slate-400">2021年11月1日正式实施。它宣告了“流量至上”时代的终结，开启了“隐私优先”的数字治理新纪元。</p>
+        </div>
+        <button onclick="changePage(1)" class="mt-8 bg-emerald-600 px-16 py-5 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl shadow-emerald-900/40">进入法理拆解</button>
+    </section>
+
+    <!-- 1. 核心定义与原则 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">模块一：界限与基石</h2>
+        <div class="glass-card">
+            <div class="law-highlight">
+                <h4 class="text-2xl font-bold text-emerald-400 mb-2">什么是个人信息？</h4>
+                <p class="text-lg">以电子或者其他方式记录的与<span class="text-blue-400 font-bold">已识别或者可识别</span>的自然人有关的各种信息。注意：匿名化处理后的信息不再属于个人信息。</p>
+            </div>
+            <div class="law-highlight">
+                <h4 class="text-2xl font-bold text-emerald-400 mb-2">最小必要原则</h4>
+                <p class="text-lg">处理个人信息应当具有明确、合理的目的，并应当与处理目的直接相关，采取<span class="text-blue-400 font-bold">对个人权益影响最小的方式</span>。收集频率和范围不得超出目的所需。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 告知-同意 准则 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">模块二：告知-同意的升级</h2>
+        <div class="glass-card">
+            <p class="text-xl mb-6">法律确立了以“告知-同意”为核心的个人信息处理规则：</p>
+            <ul class="text-lg space-y-4 text-slate-300">
+                <li class="flex gap-4"><span class="text-blue-400 font-black">●</span> <b>充分告知：</b>处理者应当以显著方式、清晰易懂的语言真实、准确、完整地向个人告知。</li>
+                <li class="flex gap-4"><span class="text-blue-400 font-black">●</span> <b>撤回权：</b>个人有权撤回同意。处理者应当提供便捷的撤回方式，且不得因此拒绝提供服务。</li>
+                <li class="flex gap-4"><span class="text-blue-400 font-black">●</span> <b>单独同意：</b>处理敏感个人信息、向他人提供信息、公开个人信息等特定情形，需取得“单独同意”。</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 3. 敏感信息与自动化决策 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">模块三：严管敏感与算法</h2>
+        <div class="glass-card">
+            <div class="law-highlight">
+                <h4 class="text-2xl font-bold text-rose-400 mb-2">敏感个人信息</h4>
+                <p class="text-lg">一旦泄露或非法使用，容易导致人格尊严受侵害、人身财产安全受威胁的信息。如：<span class="text-rose-300">生物识别、宗教信仰、特定身份、医疗健康、金融账户、行踪轨迹</span>等。</p>
+            </div>
+            <div class="law-highlight">
+                <h4 class="text-2xl font-bold text-sky-400 mb-2">自动化决策 (拒绝“大数据杀熟”)</h4>
+                <p class="text-lg">利用个人信息进行自动化决策，应当保证决策的透明度和结果公平、公正，不得对个人在交易价格等交易条件上实行不合理的差别待遇。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 题目 1 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-title">实战考核 (1)：信息的边界</h2>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-6">Q1: 某互联网公司将其数据库中的所有用户名替换成了随机生成的长字符串（如：User_9x2j），并宣称这些数据已经“匿名化”，可以无需授权直接在市场上售卖。根据《个保法》，这一做法：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：错误。这仅属于“去标识化”。如果结合其他数据（如IP、浏览记录）仍能推导出具体自然人，则不符合匿名化标准。')">A. 合法。因为姓名已隐藏，无法直接识别个人身份。</button>
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确。法律要求匿名化必须达到“无法识别且不可复原”的程度。通过随机ID替换仅是“去标识化”，仍受本法保护。')">B. 违法。这属于去标识化而非匿名化，仍属于个人信息范畴。</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 5. 题目 2 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title">实战考核 (2)：撤回的困境</h2>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-6">Q2: 张三在使用某社交App时，撤回了“读取位置信息”的授权。App随后弹窗提示：“由于您拒绝提供位置信息，为了保证系统稳定，我们将停止为您提供包括聊天、发动态在内的所有基础功能。”该做法是否合规？</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确。第十六条规定，处理者不得以个人不同意处理其非必要信息或撤回同意为由，拒绝提供产品或者服务。')">A. 不合规。处理者不得因用户撤回非必要信息的同意而拒绝基础服务。</button>
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：错误。位置信息对于社交App的“基础聊天”并非核心必要信息，拒绝全量服务属于违法行为。')">B. 合规。企业有权为了保障App的完整体验而设置准入门槛。</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 6. 题目 3 -->
+    <section class="page-section" id="p6">
+        <h2 class="text-title">实战考核 (3)：敏感信息的保护</h2>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-6">Q3: 某高端小区为了加强安保，强制要求所有业主必须通过“刷脸”进出，拒绝刷脸的业主只能绕行侧门。物业公司在《物业服务协议》中以加粗字体告知了刷脸规则，并在业主签字后开启。此流程存在什么法律缺陷？</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：加粗仅是告知方式的一种。关键在于敏感信息的特殊授权要求。')">A. 告知方式不显著。应该在小区门口张贴大字海报说明。</button>
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确。生物识别属于敏感个人信息，法律要求必须取得“单独同意”。物业在综合协议中混入告知并签字，不符合单独授权的要求。')">B. 授权方式不合规。处理人脸等敏感信息必须取得“单独同意”，且需具备充分必要性。')</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 7. 题目 4 -->
+    <section class="page-section" id="p7">
+        <h2 class="text-title">实战考核 (4)：算法的公平</h2>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-6">Q4: 某外卖平台通过算法发现，老用户对价格敏感度低，且习惯于在高峰期下单。于是系统对老用户显示的配送费统一调高了 1 元。这一行为在《个保法》下被定义为：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确。第二十四条严禁在交易价格等条件上利用自动化决策实行不合理差别待遇（即大数据杀熟）。')">A. 违法的差别待遇。利用自动化决策实施不合理的个性化加价。</button>
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：这种“价格歧视”正是个保法打击的重点，其本质是对个人信息处理结果的不当利用。')">B. 合法的市场定价。平台有权根据用户的消费能力进行动态运筹调配。</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 8. 题目 5 -->
+    <section class="page-section" id="p8">
+        <h2 class="text-title">实战考核 (5)：跨境的红线</h2>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-6">Q5: 某跨国公司中国分公司欲将其在中国境内收集的客户信息传输至海外总部进行全球业务汇总。已知该公司处理的个人信息未达到网信部门规定的数量阈值。此时，该公司：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：错误。跨境传输必须经过一系列合规动作，包括评估和获取个人单独同意。')">A. 可以直接传输。因为它是内部管理，且未达到监管数量。 </button>
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确。跨境传输必须满足第三十八条要求（如通过标准合同等），且必须向个人告知境外接收方信息并取得单独同意。')">B. 必须取得个人的单独同意，并根据法律要求通过安全评估或签署标准合同。 </button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 9. 总结 -->
+    <section class="page-section justify-center text-center" id="p9">
+        <h2 class="text-huge mb-10 text-white">教学总结</h2>
+        <div class="max-w-4xl text-left space-y-6 bg-slate-900/50 p-10 rounded-3xl border border-blue-500/20 shadow-2xl">
+            <p class="text-2xl text-slate-300">🛡️ <b>权利回归：</b>个保法将数据的主动权交还给个人，确立了撤回权、解释权、可携带权。</p>
+            <p class="text-2xl text-slate-300">⚖️ <b>责任压实：</b>企业不再是信息的占有者，而是“受托管理人”，必须履行合规审计与影响评估义务。</p>
+            <p class="text-2xl text-blue-400 font-bold">理解法律背后的精神：平衡数字经济的创新与个体基本人权的保护。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-12 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black shadow-2xl hover:scale-105 transition">重新开始学习</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 10;
+
+        // 初始化指示点
+        const dotBar = document.getElementById('dotBar');
+        for(let i=0; i<totalPages; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+            dot.id = 'dot-' + i;
+            dotBar.appendChild(dot);
+        }
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = (currentPage >= 4 && currentPage < 9) ? 'none' : 'block';
+            if (currentPage === totalPages - 1) document.getElementById('nextBtn').style.display = 'none';
+
+            // 更新点
+            document.querySelectorAll('.progress-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentPage);
+            });
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function handleQuiz(btn, isCorrect, explanation) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.feedback-box');
+            const options = container.querySelectorAll('.quiz-option');
+
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            options.forEach(opt => opt.style.opacity = "0.5");
+            btn.style.opacity = "1";
+
+            feedback.style.display = "block";
+            feedback.innerHTML = explanation;
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.classList.add('bg-green-900/30', 'text-green-400');
+            } else {
+                btn.classList.add('wrong');
+                feedback.classList.add('bg-red-900/30', 'text-red-400');
+            }
+
+            // 答题后恢复下一步
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        window.onload = updateUI;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
