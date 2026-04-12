@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App 个人信息合规认定实战教学系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(1.02); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 投影优化字号 */
+        .text-huge { font-size: clamp(2.5rem, 6vw, 5.5rem); font-weight: 900; line-height: 1.1; text-align: center; }
+        .text-title { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+        .text-body { font-size: 1.6rem; line-height: 1.6; color: #cbd5e1; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        .law-category {
+            border-left: 8px solid #38bdf8;
+            padding-left: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* 题目样式 */
+        .quiz-container {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38bdf8;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin: 0.8rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            font-size: 1.4rem;
+        }
+
+        .quiz-option:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .feedback-box { margin-top: 1.5rem; padding: 1.5rem; border-radius: 1rem; font-weight: bold; font-size: 1.3rem; line-height: 1.6; display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一认定项</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center" id="p0">
+        <h1 class="text-huge mb-6 text-white">App 个人信息合规</h1>
+        <h2 class="text-huge mb-10 text-blue-400">认定方法深度实战</h2>
+        <div class="glass-card text-center">
+            <p class="text-2xl text-slate-300 font-light">深度解读国信办〔2019〕191号文件</p>
+            <p class="text-xl text-slate-400 mt-4 italic">—— 掌握 6 大类别合规红线，防范 App 法律风险</p>
+        </div>
+        <button onclick="changePage(1)" class="mt-8 bg-blue-600 px-16 py-6 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl shadow-blue-900/40">进入认定解析</button>
+    </section>
+
+    <!-- 1. 解析分类 1-2 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">认定类别 (一) & (二)</h2>
+        <div class="glass-card">
+            <div class="law-category">
+                <h3 class="text-3xl font-black text-blue-400 mb-4">壹：未公开收集使用规则</h3>
+                <ul class="text-xl text-slate-300 space-y-2">
+                    <li>● App 内缺少隐私政策（或政策中未包含规则）。</li>
+                    <li>● 规则难以访问：点击次数超过 4 次、字体过小或颜色过淡无法阅读。</li>
+                </ul>
+            </div>
+            <div class="law-category border-sky-500">
+                <h3 class="text-3xl font-black text-sky-400 mb-4">贰：未明示目的、方式和范围</h3>
+                <ul class="text-xl text-slate-300 space-y-2">
+                    <li>● <b>SDK 管理：</b>未逐一列出第三方插件/代码收集信息的目的与范围。</li>
+                    <li>● <b>敏感权限：</b>申请身份证、银行账号时，未同步告知明确目的。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 解析分类 3-4 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">认定类别 (三) & (四)</h2>
+        <div class="glass-card">
+            <div class="law-category">
+                <h3 class="text-3xl font-black text-blue-400 mb-4">叁：未经用户同意收集使用</h3>
+                <ul class="text-xl text-slate-300 space-y-2">
+                    <li>● <b>默认同意：</b>以默认勾选隐私政策的方式征求同意。</li>
+                    <li>● <b>定向推送：</b>利用算法定向推送，但未提供非定向推送的关闭选项。</li>
+                    <li>● <b>强制恢复：</b>App 更新后自动将用户关闭的权限恢复到默认开启状态。</li>
+                </ul>
+            </div>
+            <div class="law-category border-sky-500">
+                <h3 class="text-3xl font-black text-sky-400 mb-4">肆：违反必要原则</h3>
+                <ul class="text-xl text-slate-300 space-y-2">
+                    <li>● <b>权限打包：</b>强制要求用户授权无关权限，否则无法使用（如天气预报 App 要求联系人权限）。</li>
+                    <li>● <b>过度收集：</b>收集与提供服务无关的敏感个人信息。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 解析分类 5-6 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">认定类别 (五) & (六)</h2>
+        <div class="glass-card">
+            <div class="law-category">
+                <h3 class="text-3xl font-black text-blue-400 mb-4">伍：未经同意向他人提供</h3>
+                <ul class="text-xl text-slate-300 space-y-2">
+                    <li>● 数据出流未经授权：接入第三方插件时，未经同意直接传输个人信息。</li>
+                    <li>● 未做脱敏处理：提供给他人时，未对个人信息进行匿名化或去标识化。</li>
+                </ul>
+            </div>
+            <div class="law-category border-sky-500">
+                <h3 class="text-3xl font-black text-sky-400 mb-4">陆：未提供更正、删除功能</h3>
+                <ul class="text-xl text-slate-300 space-y-2">
+                    <li>● <b>注销障碍：</b>为注销账号设置不合理条件（如要求手持身份证录像）。</li>
+                    <li>● <b>响应延迟：</b>注销、更正申请在 15 个工作日内未受理。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 题目 1 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-title">实战案例考核 (1)</h2>
+        <div class="quiz-container">
+            <p class="text-2xl font-bold mb-6">Q1: 某金融类 App 在隐私政策中写道：“为了提升服务质量，我们会根据您的搜索偏好为您推荐内容。”但在设置界面中，用户无法找到任何可以关闭此类推荐的按钮。根据认定方法，这属于：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确！根据第三大类第6条，利用个人信息和算法定向推送信息，但未提供非定向推送信息的选项，被认定为“未经用户同意收集使用个人信息”。')">A. 未经用户同意收集使用个人信息</button>
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：虽然它告知了目的，但核心违规点在于没有提供关闭“选择权”，即未经用户持续同意。')">B. 未公开收集使用规则</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 5. 题目 2 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title">实战案例考核 (2)</h2>
+        <div class="quiz-container">
+            <p class="text-2xl font-bold mb-6">Q2: 某拍照 App 在更新版本后，主界面弹出一个提示框显示：“我们需要访问您的通讯录和地理位置以增强分享体验。如果您拒绝，App 将自动退出并无法运行。”此行为属于：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确！这属于“捆绑授权”或“强制授权”。第四大类第1条明确，因用户不同意收集非必要个人信息而拒绝提供业务功能，属于违反必要原则。')">A. 违反必要原则（强制要求无关权限）</button>
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：虽然该 App 明示了目的，但由于拒绝授权导致整个 App 停用，违反了收集信息的“最小必要”基石。')">B. 未明示收集使用个人信息的范围</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 6. 题目 3 -->
+    <section class="page-section" id="p6">
+        <h2 class="text-title">实战案例考核 (3)</h2>
+        <div class="quiz-container">
+            <p class="text-2xl font-bold mb-6">Q3: 某资讯 App 嵌入了名为“广告通”的第三方 SDK 用于分析用户画像。App 的隐私政策中写明了“我们可能会与合作伙伴共享数据”，但没有具体列出“广告通”的具体名称及其收集的具体字段。这触犯了哪类红线？</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：虽然没有公开具体的 SDK 规则，但法条中对于“未明示第三方代码收集范围”有更直接的归类。')">A. 未公开收集使用规则</button>
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确！根据第二大类第1条，未逐一列出 App（包括委托的第三方或嵌入的第三方代码）收集信息的目的、方式和范围，属于“未明示”。')">B. 未明示收集使用个人信息的目的、方式和范围</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 7. 题目 4 -->
+    <section class="page-section" id="p7">
+        <h2 class="text-title">实战案例考核 (4)</h2>
+        <div class="quiz-container">
+            <p class="text-2xl font-bold mb-6">Q4: 李某在使用某打车 App 申请注销账号时，系统提示：“由于您在本平台购买过 10 元优惠券，注销账号会导致优惠券余额失效，因此暂不开放注销功能，直至其余额消耗完毕。”这种逻辑：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确！根据第六大类第2条，为注销用户账号设置不必要或不合理条件（如以余额未清零为由阻碍注销），属于违规行为。')">A. 构成违规：为注销用户账号设置不合理条件</button>
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：App 虽然告知了原因，但余额失效不应作为拒绝行使注销权利（即删除个人信息）的前置条件。')">B. 符合法规：企业有权保障资产不流失</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 8. 题目 5 -->
+    <section class="page-section" id="p8">
+        <h2 class="text-title">实战案例考核 (5)</h2>
+        <div class="quiz-container">
+            <p class="text-2xl font-bold mb-6">Q5: 某修图 App 在首次启动时，用户还没有点击“进入 App”或“同意政策”按钮，系统底层已经通过后台代码静默读取了手机的 IMEI 号（设备唯一识别码）。这一行为被认定为：</p>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="handleQuiz(this, false, '解析：设备识别码属于个人信息，获取它必须经过授权。')">A. 合法的设备识别，不算个人隐私</button>
+                <button class="quiz-option" onclick="handleQuiz(this, true, '解析：正确！第三大类第1条规定：征得用户同意前就开始收集个人信息或打开可收集个人信息的权限，属于违规收集。')">B. 未经用户同意收集使用个人信息（先行收集）</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 9. 总结 -->
+    <section class="page-section justify-center text-center" id="p9">
+        <h2 class="text-huge mb-10 text-white">教学总结</h2>
+        <div class="max-w-4xl text-left space-y-8 bg-slate-900/80 p-12 rounded-[3rem] border-4 border-blue-500/20 shadow-2xl">
+            <p class="text-2xl text-slate-300">⚖️ <b>认定核心：</b>不仅仅看“收不收”，更看重“透不透明”、“必不必要”、“能不能控”。</p>
+            <p class="text-2xl text-slate-300">🛡️ <b>开发者自查：</b>必须做到隐私政策易得、授权明示、权限不打包、注销不设障。</p>
+            <p class="text-2xl text-blue-400 font-bold">合规是 CRM 系统与数字化产品生存的底线，更是赢得用户信任的资产。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-12 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black shadow-2xl hover:scale-105 transition">重新开始测评</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 10;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = (currentPage >= 4 && currentPage < 9) ? 'none' : 'block';
+            if (currentPage === totalPages - 1) document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function handleQuiz(btn, isCorrect, explanation) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.feedback-box');
+            const options = container.querySelectorAll('.quiz-option');
+
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            options.forEach(opt => opt.style.opacity = "0.5");
+            btn.style.opacity = "1";
+
+            feedback.style.display = "block";
+            feedback.innerHTML = explanation;
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.classList.add('bg-green-900/40', 'text-green-400', 'animate-pulse');
+            } else {
+                btn.classList.add('wrong');
+                feedback.classList.add('bg-red-900/40', 'text-red-400');
+            }
+
+            // 答题后显示下一页按钮
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        window.onload = updateUI;
+
+        // 键盘翻页支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
