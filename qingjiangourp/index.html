@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青建集团：数字票据+供应链自金融模式解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 3rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 投影优化字号 */
+        .text-huge { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1.1; }
+        .text-title { font-size: clamp(2rem, 5vw, 3.8rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; color: #cbd5e1; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .highlight { color: #38bdf8; font-weight: 900; }
+
+        .tech-tag {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 0.3rem 1.2rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        /* 流程进度指示 */
+        .process-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #334155;
+            transition: 0.3s;
+        }
+        .process-dot.active { background: #38bdf8; box-shadow: 0 0 15px #38bdf8; }
+
+        /* 题目样式 */
+        .quiz-container {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38bdf8;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 1rem;
+        }
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem;
+            margin: 0.5rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            font-size: 1.5rem;
+        }
+        .quiz-option:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航条 -->
+    <div class="fixed top-0 left-0 w-full p-4 flex justify-center gap-2 z-[10001]">
+        <div class="process-dot active" id="dot0"></div>
+        <div class="process-dot" id="dot1"></div>
+        <div class="process-dot" id="dot2"></div>
+        <div class="process-dot" id="dot3"></div>
+        <div class="process-dot" id="dot4"></div>
+        <div class="process-dot" id="dot5"></div>
+        <div class="process-dot" id="dot6"></div>
+        <div class="process-dot" id="dot7"></div>
+        <div class="process-dot" id="dot8"></div>
+    </div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center text-center" id="p0">
+        <div class="mb-8 opacity-80">
+            <svg class="w-32 h-32 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        </div>
+        <h1 class="text-huge mb-6">青建集团<br><span class="text-blue-400">“数字票据+供应链”</span></h1>
+        <h2 class="text-4xl font-bold text-slate-400 mb-10 italic">—— 建筑业“自金融”模式深度解析 ——</h2>
+        <p class="text-2xl text-slate-500 max-w-4xl">依托区块链技术，实现企业信用数字化与产业链普惠金融。</p>
+        <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-5 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl">开启沉浸学习</button>
+    </section>
+
+    <!-- 1. 背景：建筑行业的痛点 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">1. 为什么需要“自金融”？</h2>
+        <div class="glass-card">
+            <p class="text-2xl mb-8">传统建筑供应链面临三大难题：</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-red-900/20 border border-red-500/30 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-red-400 mb-2">融资难</h3>
+                    <p class="text-lg">中小供应商缺乏抵押物，难以从银行直接获批贷款。</p>
+                </div>
+                <div class="p-6 bg-red-900/20 border border-red-500/30 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-red-400 mb-2">融资贵</h3>
+                    <p class="text-lg">层层中介加价，供应商实际资金成本高昂，影响利润。</p>
+                </div>
+                <div class="p-6 bg-red-900/20 border border-red-500/30 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-red-400 mb-2">流转慢</h3>
+                    <p class="text-lg">传统纸质或电子汇票不可拆分，无法支付下游零散支出。</p>
+                </div>
+            </div>
+        </div>
+        <p class="text-2xl mt-10">青建集团的对策：<span class="highlight">将企业信用化为可流转、可拆分的“数字权证”。</span></p>
+    </section>
+
+    <!-- 2. 青建做法：数字化信用 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">2. 青建集团的核心做法</h2>
+        <div class="glass-card">
+            <div class="space-y-8">
+                <div class="flex items-start gap-6">
+                    <div class="bg-blue-600 text-white p-4 rounded-full font-black text-2xl">做</div>
+                    <div>
+                        <h4 class="text-3xl font-bold mb-2">建立“青易链”平台</h4>
+                        <p class="text-2xl text-slate-300">联合科技公司开发基于区块链的供应链金融平台，确立“自金融”的技术底座。</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6">
+                    <div class="bg-blue-600 text-white p-4 rounded-full font-black text-2xl">法</div>
+                    <div>
+                        <h4 class="text-3xl font-bold mb-2">信用资产Token化</h4>
+                        <p class="text-2xl text-slate-300">将集团的优质信用转化为区块链数字票据（即“数字权证”），以此替代传统的现金支付或银行票据。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】青建集团“自金融”模式的核心是：</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 将企业信用数字化为可拆分、可流转的权证</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 完全依赖银行进行贷款审批</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 3. 业务流程 Step 1: 签发 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">3. 业务流程 (1)：数字权证签发</h2>
+        <div class="glass-card">
+            <div class="flex flex-col md:flex-row gap-10 items-center">
+                <div class="flex-1">
+                    <span class="tech-tag">底层技术：非对称加密 & 智能合约</span>
+                    <p class="text-2xl">当青建集团与一级供应商产生贸易往来时，集团在平台上签发数字权证. 权证包含：<span class="highlight">贸易背景、金额、到期日。</span></p>
+                    <p class="text-xl text-slate-400 mt-4 italic">技术原理：通过集团私钥签名，确立付款责任，上链存证，不可篡改。</p>
+                </div>
+                <div class="flex-shrink-0 bg-slate-800 p-8 rounded-3xl border-2 border-dashed border-blue-500 text-center">
+                    <div class="text-6xl mb-4">✍️</div>
+                    <p class="font-bold">信用即发票</p>
+                    <p class="text-sm">链上存证</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 业务流程 Step 2: 拆分与流转 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-title">3. 业务流程 (2)：无限拆分流转</h2>
+        <div class="glass-card">
+            <div class="flex flex-col md:flex-row gap-10 items-center">
+                <div class="flex-1">
+                    <span class="tech-tag">底层技术：分布式账本 & 哈希链</span>
+                    <p class="text-2xl">一级供应商收到100万权证后，可根据需要将其拆分为20万支付给分包商，30万支付给材料商. 权证可沿供应链<span class="highlight">逐级向下渗透</span>。</p>
+                    <p class="text-xl text-slate-400 mt-4 italic">技术原理：区块链记录每一笔拆分流转的哈希值，确保权属清晰，杜绝“一票多用”。</p>
+                </div>
+                <div class="flex-shrink-0 grid grid-cols-2 gap-4">
+                    <div class="bg-blue-600/30 p-4 rounded-xl border border-blue-400 text-center">拆分 A: 20W</div>
+                    <div class="bg-blue-600/30 p-4 rounded-xl border border-blue-400 text-center">拆分 B: 30W</div>
+                    <div class="bg-blue-600/30 p-4 rounded-xl border border-blue-400 text-center">拆分 C: 50W</div>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】数字权证相比传统银行汇票，在流转上最大的优势是？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 能够按需无限次拆分，适应小额支付需求</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 只能整票背书流转，无法满足供应链多级拆分需求</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 5. 业务流程 Step 3: 信用贴现 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title">3. 业务流程 (3)：极速融资贴现</h2>
+        <div class="glass-card">
+            <span class="tech-tag">底层技术：穿透式审计 & 零知识证明 (逻辑)</span>
+            <p class="text-2xl mb-6">位于供应链末端的“毛细血管”企业，由于持有包含青建集团信用的权证，可直接在平台发起贴现申请，银行或集团保理公司<span class="highlight">秒级放款</span>。</p>
+            <p class="text-xl text-slate-400 italic">技术原理：银行为信任“青建集团”的信用，而非单纯审核小微企业。区块链提供的全链条溯源让银行无需人工核实贸易真实性。</p>
+        </div>
+    </section>
+
+    <!-- 6. 业务流程 Step 4: 到期自动兑付 -->
+    <section class="page-section" id="p6">
+        <h2 class="text-title">3. 业务流程 (4)：到期闭环清算</h2>
+        <div class="glass-card">
+            <span class="tech-tag">底层技术：智能合约 (Smart Contract)</span>
+            <p class="text-2xl mb-6">权证到期日，系统根据预设的<span class="highlight">智能合约代码</span>，自动将集团账户资金划转至最终持有人账户. 整个过程无需人工干预。</p>
+            <p class="text-xl text-slate-400 italic">技术原理：代码即法律. 减少了人为拖欠的可能性，提升了结算效率。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】智能合约在兑付环节的作用是：</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 预设条件触发后，系统自动执行资金划转</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 依靠人工逐笔在线确认并手动转账</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 7. “自金融”模式的价值 -->
+    <section class="page-section" id="p7">
+        <h2 class="text-title">4. 为什么叫“自金融”模式？</h2>
+        <div class="glass-card bg-emerald-900/10 border-emerald-500/30">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-3xl font-black text-emerald-400 mb-4">对青建集团：</h4>
+                    <ul class="text-xl space-y-4 list-disc ml-8 text-slate-300">
+                        <li>盘活沉淀资产，降低整体财务费用。</li>
+                        <li>通过信用赋能，稳定供应链合作关系。</li>
+                        <li>建立完整的数字化产业数据库。</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-3xl font-black text-emerald-400 mb-4">对供应链企业：</h4>
+                    <ul class="text-xl space-y-4 list-disc ml-8 text-slate-300">
+                        <li>融资门槛从“看资产”转为“看信用”。</li>
+                        <li>融资成本大幅下降。</li>
+                        <li>支付更便捷，解决资金回笼周期长的问题。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. 总结 -->
+    <section class="page-section justify-center text-center" id="p8">
+        <h2 class="text-huge mb-10">教学总结</h2>
+        <div class="max-w-4xl text-left space-y-6 bg-slate-900/50 p-10 rounded-3xl border border-blue-500/20">
+            <p class="text-2xl">🏗️ <span class="text-blue-400 font-black">产业+金融：</span>建筑实业与数字化金融的深度融合。</p>
+            <p class="text-2xl">🔗 <span class="text-blue-400 font-black">区块链赋能：</span>提供真实、透明、可拆分的信用基石。</p>
+            <p class="text-2xl">💸 <span class="text-blue-400 font-black">自金融生态：</span>从“靠银行贷”到“凭信用转”，构建产业命运共同体。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-16 bg-white text-slate-900 px-12 py-5 rounded-full text-2xl font-black">重新演示</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 9;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            
+            // 更新进度指示点
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.getElementById('dot' + i);
+                if (dot) dot.classList.toggle('active', i === currentPage);
+            }
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function checkQuiz(btn, isCorrect) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.quiz-feedback');
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerText = "✨ 回答正确！青建模式的核心就在于信用数字化。";
+                feedback.className = "quiz-feedback block mt-4 text-xl font-bold text-green-400 animate-bounce";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerText = "❌ 选错了。请思考区块链权证与传统票据业务在灵活性上的差异。";
+                feedback.className = "quiz-feedback block mt-4 text-xl font-bold text-red-400";
+            }
+        }
+
+        window.onload = updateUI;
+
+        // 键盘控制
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
