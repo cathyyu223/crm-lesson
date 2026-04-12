@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字票据平台：架构与流程深度解构</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden; 
+        }
+
+        /* 核心页面容器 */
+        .page-section {
+            display: none; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem 2rem 8rem 2rem; 
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(1.02); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 投影优化字号 */
+        .text-huge { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1.1; }
+        .text-title { font-size: clamp(2rem, 5vw, 3.8rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; color: #cbd5e1; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        /* 交互式架构图（左侧） */
+        .arch-draw-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .arch-draw-layer {
+            padding: 1.2rem;
+            border-radius: 0.8rem;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            border: 2px solid rgba(56, 189, 248, 0.4);
+            background: linear-gradient(90deg, rgba(30, 64, 175, 0.2) 0%, rgba(30, 58, 138, 0.4) 100%);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .arch-draw-layer:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* 题目样式 */
+        .quiz-container {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38bdf8;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            margin: 0.5rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            font-size: 1.5rem;
+        }
+
+        .quiz-option:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: #38bdf8;
+            color: #020617;
+            padding: 0.2rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* 图片展示区域优化 */
+        .image-frame {
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 1.5rem;
+            border: 4px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center text-center" id="p0">
+        <h1 class="text-huge mb-8">数字票据平台<br><span class="text-blue-400">架构与流程全解析</span></h1>
+        <p class="text-3xl text-slate-400 max-w-4xl">功能·架构·业务流程 · 一站式沉浸学习</p>
+        <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-5 rounded-full text-2xl font-black hover:scale-110 transition">点击进入演示</button>
+    </section>
+
+    <!-- 1. 核心功能 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">模块一：平台核心功能</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+            <div class="glass-card text-center"><div class="text-4xl mb-4">💎</div><h3 class="text-2xl font-black text-blue-400 mb-2">资产数字化</h3><p class="text-lg">票据转化为链上唯一权证。</p></div>
+            <div class="glass-card text-center"><div class="text-4xl mb-4">📜</div><h3 class="text-2xl font-black text-blue-400 mb-2">智能合约</h3><p class="text-lg">自动执行业务规则与兑付。</p></div>
+            <div class="glass-card text-center"><div class="text-4xl mb-4">⚡</div><h3 class="text-2xl font-black text-blue-400 mb-2">实时流转</h3><p class="text-lg">秒级确权，无须中介介入。</p></div>
+            <div class="glass-card text-center"><div class="text-4xl mb-4">🔍</div><h3 class="text-2xl font-black text-blue-400 mb-2">全流程溯源</h3><p class="text-lg">每一个环节都不可篡改。</p></div>
+            <div class="glass-card text-center"><div class="text-4xl mb-4">🛡️</div><h3 class="text-2xl font-black text-blue-400 mb-2">信用穿透</h3><p class="text-lg">解决中小微企业融资贵问题。</p></div>
+            <div class="glass-card text-center"><div class="text-4xl mb-4">⚖️</div><h3 class="text-2xl font-black text-blue-400 mb-2">穿透式监管</h3><p class="text-lg">实时监测系统性金融风险。</p></div>
+        </div>
+    </section>
+
+    <!-- 2. 技术架构总览 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">模块二：技术架构总览</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full max-w-7xl items-start pt-6">
+            <!-- 左侧：交互式重绘 -->
+            <div class="arch-draw-container">
+                <div class="arch-draw-layer" onclick="changePage(3-currentPage)">应用层 (Application Layer)</div>
+                <div class="arch-draw-layer" onclick="changePage(4-currentPage)">服务层 (Service Layer)</div>
+                <div class="arch-draw-layer" onclick="changePage(5-currentPage)">合约层 (Contract Layer)</div>
+                <div class="arch-draw-layer" onclick="changePage(6-currentPage)">核心账本层 (Ledger Layer)</div>
+                <div class="arch-draw-layer" onclick="changePage(7-currentPage)">基础设施层 (Infrastructure)</div>
+                <p class="text-center text-slate-500 text-sm mt-4 italic">点击层级可直接跳转详解</p>
+            </div>
+            <!-- 右侧：图片展示 -->
+            <div class="flex flex-col items-center">
+                <div class="image-frame w-full">
+                    <!-- 图片文件名必须与上传的“数字票据平台技术架构.jpg”完全一致 -->
+                    <img src="数字票据平台技术架构.jpg" alt="数字票据平台技术架构" class="w-full h-auto rounded-lg shadow-2xl" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <!-- 备用提示：如果图片无法加载（例如路径不对）时显示 -->
+                    <div class="hidden p-20 text-center bg-slate-800 text-slate-400 rounded-lg">
+                        <p class="text-2xl font-bold mb-4">🖼️ 图片未找到</p>
+                        <p class="text-lg">请确保图片文件名正确（数字票据平台技术架构.jpg）<br>并与本 HTML 文件存放在同一文件夹内。</p>
+                    </div>
+                </div>
+                <p class="text-xl text-blue-400 mt-6 font-bold">—— 官方技术架构参考原件 ——</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 后续页面 (3-13) 逻辑保持不变... -->
+    <!-- 3. 应用层详解 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">架构解析：应用层</h2>
+        <div class="glass-card">
+            <span class="tech-badge">UI & 终端接口</span>
+            <p class="text-2xl">它是用户操作的入口，包括微信、App及银行审批界面。重点在于提供**穿透式监测**的视觉呈现。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】监管机构实时查看全网票据状态，主要通过哪一层？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 应用层（监管驾驶舱界面）</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 基础设施层</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 4. 服务层详解 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-title">架构解析：服务层</h2>
+        <div class="glass-card">
+            <span class="tech-badge">CA认证 & 身份管理</span>
+            <p class="text-2xl">通过**数字证书(CA)**确保每一笔票据交易的参与者身份真实、合法且不可抵赖。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】服务层中的“CA认证”解决了什么核心问题？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 确保操作者身份真实、防赖账</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 决定票据的面值大小</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 5. 合约层详解 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title">架构解析：合约层</h2>
+        <div class="glass-card">
+            <span class="tech-badge">智能合约 (Smart Contracts)</span>
+            <p class="text-2xl">将汇票法律制度转化为代码逻辑。只要触发条件（如到期），资金会自动结算。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】数字票据实现“自动结算”主要依赖哪一层？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 合约层（自动化执行逻辑）</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 应用层</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 6. 核心账本层详解 -->
+    <section class="page-section" id="p6">
+        <h2 class="text-title">架构解析：核心账本层</h2>
+        <div class="glass-card">
+            <span class="tech-badge">分布式底座 & 共识算法</span>
+            <p class="text-2xl">使用P2P网络连接节点，通过共识机制保证全网账本一致，防止篡改和“双花”风险。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】“共识算法”在账本层的主要作用是？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 保证分布式节点间数据的一致性和真实性</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 压缩文件的大小</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 7. 基础设施层详解 -->
+    <section class="page-section" id="p7">
+        <h2 class="text-title">架构解析：基础设施层</h2>
+        <div class="glass-card">
+            <span class="tech-badge">计算与存储硬件</span>
+            <p class="text-2xl">提供物理支撑，包括云服务器、网络防火墙及安全存储阵列。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】基础设施层故障会导致？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 系统无法访问，体现了物理基石的重要性</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 所有的票据自动失效</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 8. 业务流程：签发 -->
+    <section class="page-section" id="p8">
+        <h2 class="text-title">模块三：业务流程 - 签发</h2>
+        <div class="glass-card text-left">
+            <span class="tech-badge">技术：非对称加密 & 数字签名</span>
+            <p class="text-2xl mb-4">出票人通过私钥对票据加密签名，证明身份并锁定权属。信息即刻全网广播上链。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考】签发时使用“数字签名”是为了？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 确保票据不可伪造，验证出票人真实性</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 增加票据的利息</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 9. 业务流程：承兑 -->
+    <section class="page-section" id="p9">
+        <h2 class="text-title">模块三：业务流程 - 承兑</h2>
+        <div class="glass-card">
+            <span class="tech-badge">技术：逻辑锁定 (Locking)</span>
+            <p class="text-2xl">承兑人确认付款责任，智能合约自动锁定对应的信用额度，排除违约风险。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考】数字票据承兑后，资金安全由谁保障？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 预设的代码逻辑（智能合约）强制锁定</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 承兑人的口头诚信</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 10. 业务流程：流转 -->
+    <section class="page-section" id="p10">
+        <h2 class="text-title">模块三：业务流程 - 背书流转</h2>
+        <div class="glass-card">
+            <span class="tech-badge">技术：P2P 确权</span>
+            <p class="text-2xl">持票人转让权属。由于是分布式账本，权属变更瞬间完成，彻底解决了“一票多卖”难题。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考】区块链如何防止同一张票被卖给两个人？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 全网分布式账本的唯一性和实时同步特性</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 禁止用户多次操作</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 11. 业务流程：贴现融资 -->
+    <section class="page-section" id="p11">
+        <h2 class="text-title">模块三：业务流程 - 贴现融资</h2>
+        <div class="glass-card">
+            <span class="tech-badge">技术：信用穿透</span>
+            <p class="text-2xl">核心企业信用沿链条无损传递，银行能快速追溯前置业务真实性，给予低成本贴现。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考】为什么数字票据平台贴现更快？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 信用记录透明且可全链追溯，风险评估极速完成</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 银行不再需要利息</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 12. 业务流程：兑付结算 -->
+    <section class="page-section" id="p12">
+        <h2 class="text-title">模块三：业务流程 - 兑付结算</h2>
+        <div class="glass-card">
+            <span class="tech-badge">技术：自动清算</span>
+            <p class="text-2xl">票据到期，合约自动触发。资金从承兑账户秒级清算至最终持票人账户。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考】数字票据兑付最大的区别是？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 无需人工干预，由智能合约自动执行清算</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 需要去银行排队取现</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 13. 总结 -->
+    <section class="page-section justify-center text-center" id="p13">
+        <h2 class="text-huge mb-10">课程教学总结</h2>
+        <div class="max-w-4xl text-left space-y-6 bg-slate-900/50 p-10 rounded-3xl border border-blue-500/20">
+            <p class="text-2xl">🏛️ <span class="text-blue-400 font-black">技术架构：</span>五层体系构建金融级安全底座。</p>
+            <p class="text-2xl">🤖 <span class="text-blue-400 font-black">业务流程：</span>全生命周期上链，代码即法律（Smart Contracts）。</p>
+            <p class="text-2xl">🛡️ <span class="text-blue-400 font-black">核心价值：</span>零伪造、高效率、穿透监管、普惠金融。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-16 bg-white text-slate-900 px-12 py-5 rounded-full text-2xl font-black">重新开始演示</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 14;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function checkQuiz(btn, isCorrect) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.quiz-feedback');
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerText = "✨ 回答正确！精准掌握核心原理。";
+                feedback.className = "quiz-feedback block mt-4 text-xl font-bold text-green-400 animate-bounce";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerText = "❌ 回答错误。请根据官方架构图再思考一下。";
+                feedback.className = "quiz-feedback block mt-4 text-xl font-bold text-red-400";
+            }
+        }
+
+        window.onload = updateUI;
+
+        // 键盘控制
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
