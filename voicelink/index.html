@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赣州银行“票链”业务深度解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-huge { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1.1; }
+        .text-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+        .text-body { font-size: 1.8rem; line-height: 1.6; color: #cbd5e1; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        .image-frame {
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 1.5rem;
+            border: 4px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 0.3rem 1.2rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* 题目样式 */
+        .quiz-container {
+            background: rgba(56, 189, 248, 0.05);
+            border: 2px solid #38bdf8;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 1rem;
+        }
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem;
+            margin: 0.5rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            font-size: 1.5rem;
+        }
+        .quiz-option:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 6px;
+            background: #38bdf8;
+            z-index: 10001;
+            transition: width 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-700">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center text-center" id="p0">
+        <div class="mb-8">
+            <svg class="w-32 h-32 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h1 class="text-huge mb-6">赣州银行“票链”</h1>
+        <h2 class="text-4xl font-bold text-slate-400 mb-10 italic">—— 破解小微企业票据融资难题 ——</h2>
+        <p class="text-2xl text-slate-500 max-w-4xl">基于“区块链+供应链金融”的数字化普惠金融平台</p>
+        <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-5 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl">进入实战学习</button>
+    </section>
+
+    <!-- 1. 平台简介 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">1. “票链”平台是什么？</h2>
+        <div class="glass-card">
+            <p class="text-2xl mb-8">“票链”是赣州银行针对中小微企业<span class="text-blue-400 font-bold">小额票据</span>（50万以下）变现难、成本高而推出的融资平台。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="p-8 bg-blue-900/20 border border-blue-500/30 rounded-3xl">
+                    <h3 class="text-3xl font-bold mb-4 text-blue-300">核心使命</h3>
+                    <ul class="text-xl space-y-4 list-disc ml-8 text-slate-300">
+                        <li>解决银行“不愿贴、不敢贴”小票的难题</li>
+                        <li>通过区块链技术建立资产信任</li>
+                        <li>实现金融资源的普惠下沉</li>
+                    </ul>
+                </div>
+                <div class="p-8 bg-emerald-900/20 border border-emerald-500/30 rounded-3xl">
+                    <h3 class="text-3xl font-bold mb-4 text-emerald-300">实测成效</h3>
+                    <ul class="text-xl space-y-4 list-disc ml-8 text-slate-300">
+                        <li><b>效率：</b>从数天审批缩短至“秒级”放款</li>
+                        <li><b>成本：</b>直连银行，去除中间层层加息</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 票链产品模式图解 (新增页面) -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">2. 票链产品模式生态圈</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl items-start">
+            <div class="space-y-6">
+                <div class="glass-card">
+                    <h3 class="text-3xl font-bold mb-4 text-blue-400">多方协同体系</h3>
+                    <p class="text-xl text-slate-300 leading-relaxed">
+                        票链平台通过区块链技术连接了：<br>
+                        <span class="text-blue-400 font-bold">● 持票人：</span>中小微企业，融资的发起者。<br>
+                        <span class="text-blue-400 font-bold">● 银行：</span>负责柜台验票、保管、托收及放款。<br>
+                        <span class="text-blue-400 font-bold">● 非银机构/投资人：</span>承接票据资产收益权。<br>
+                        <span class="text-blue-400 font-bold">● 交易中心：</span>提供资产挂牌转让平台。
+                    </p>
+                </div>
+                <div class="quiz-container">
+                    <p class="text-xl font-bold mb-4 text-sky-300">【题】根据模式图，票链平台起到的是什么作用？</p>
+                    <button class="quiz-option" onclick="checkQuiz(this, true)">A. 连接银行、企业与投资人的区块链技术纽带</button>
+                    <button class="quiz-option" onclick="checkQuiz(this, false)">B. 一个独立的、不与其他机构产生联系的储蓄所</button>
+                    <p class="quiz-feedback hidden mt-4 font-bold"></p>
+                </div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="image-frame w-full">
+                    <!-- 引入上传的图片 -->
+                    <img src="票链产品模式.jpg" alt="票链产品模式图" class="w-full h-auto rounded-lg shadow-2xl" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="hidden p-20 text-center bg-slate-800 text-slate-400 rounded-lg">
+                        <p class="text-2xl font-bold mb-4">🖼️ 图片未找到</p>
+                        <p class="text-lg">请确保图片文件名正确（票链产品模式.jpg）<br>并与本 HTML 文件存放在同一文件夹内。</p>
+                    </div>
+                </div>
+                <p class="text-xl text-blue-400 mt-6 font-bold">—— 票链产品模式参考原件 ——</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 依托的区块链技术 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">3. “票链”背后的硬核技术</h2>
+        <div class="glass-card grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-6 bg-slate-800 rounded-2xl text-center">
+                <span class="text-5xl mb-4 block">🔗</span>
+                <h4 class="text-2xl font-bold text-blue-400 mb-2">分布式账本</h4>
+                <p class="text-lg">多方共同维护账本，消除信息不对称。</p>
+            </div>
+            <div class="p-6 bg-slate-800 rounded-2xl text-center">
+                <span class="text-5xl mb-4 block">📜</span>
+                <h4 class="text-2xl font-bold text-blue-400 mb-2">智能合约</h4>
+                <p class="text-lg">规则代码化，实现自动化贴现与清算。</p>
+            </div>
+            <div class="p-6 bg-slate-800 rounded-2xl text-center">
+                <span class="text-5xl mb-4 block">🔐</span>
+                <h4 class="text-2xl font-bold text-blue-400 mb-2">共识算法</h4>
+                <p class="text-lg">确保票据确权唯一，防止资产重复融资。</p>
+            </div>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考】“票链”利用区块链技术主要为了解决金融交易中的什么核心问题？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 交易各方的信任与底层数据真实性问题</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 实现金融数据的集中化统一管理与存储</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 4. 业务流程 Step 1: 在线准入 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-title">4. 业务流程 (1)：在线准入</h2>
+        <div class="glass-card">
+            <span class="tech-badge">底层技术：CA数字证书 & 非对称加密</span>
+            <p class="text-2xl">企业通过官网、微信公众号或App进入系统。通过<span class="text-blue-400 font-bold">CA认证</span>确立企业在链上的数字身份，确保法律上的不可抵赖性。</p>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】在“票链”准入阶段，确保企业身份不可冒用的核心技术是？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 基于非对称加密的CA数字证书认证</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 传统的“用户名+口令”静态登录验证</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 5. 业务流程 Step 2: 票据托管上链 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title">4. 业务流程 (2)：实物验票与上链</h2>
+        <div class="glass-card">
+            <span class="tech-badge">底层技术：哈希存证 & 时间戳</span>
+            <p class="text-2xl mb-4">企业提交票据信息后，需到<b>银行柜台进行实物验票</b>。验票无误后，系统将票据信息写入区块链存证。</p>
+            <p class="text-xl text-slate-400 italic">关键点：引入银行物理柜台验票，极大降低了票据伪造的风险。</p>
+        </div>
+    </section>
+
+    <!-- 6. 业务流程 Step 3: 秒级放款 -->
+    <section class="page-section" id="p6">
+        <h2 class="text-title">4. 业务流程 (3)：智能贴现放款</h2>
+        <div class="glass-card">
+            <div class="flex flex-col md:flex-row gap-10">
+                <div class="flex-1">
+                    <span class="tech-badge">底层技术：智能合约 (Smart Contract)</span>
+                    <p class="text-2xl">一旦上链成功，<span class="text-blue-400 font-bold">智能合约</span>自动计算贴现款项并即刻打款。持票人实现“所见即所得”的极致融资体验。</p>
+                </div>
+                <div class="flex-shrink-0 bg-blue-900/30 p-8 rounded-3xl border border-blue-500 shadow-xl">
+                    <div class="text-5xl mb-4 text-center">🏧</div>
+                    <p class="text-center font-bold">自动处理中...</p>
+                    <div class="w-full bg-slate-700 h-2 mt-4 rounded-full overflow-hidden">
+                        <div class="bg-blue-400 h-full w-4/5 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【题】“票链”实现秒级自动放款，主要替代了传统业务中的哪一环节？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 繁琐的人工资料核验与授信审批流程</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 银行底层的核心财务结算账务处理</button>
+            <p class="quiz-feedback hidden mt-4 font-bold"></p>
+        </div>
+    </section>
+
+    <!-- 7. 业务流程 Step 4: 资产流转与结算 -->
+    <section class="page-section" id="p7">
+        <h2 class="text-title">4. 业务流程 (4)：资产挂牌与清算</h2>
+        <div class="glass-card">
+            <span class="tech-badge">底层技术：分布式账本 & 资产证券化(逻辑)</span>
+            <p class="text-Body mb-6">平台将票据资产收益权在交易中心挂牌转让，吸引合格投资人，实现资金回笼。到期后，系统自动完成闭环清算。</p>
+        </div>
+    </section>
+
+    <!-- 8. 教学总结 -->
+    <section class="page-section justify-center text-center" id="p8">
+        <h2 class="text-huge mb-10 text-white">教学总结</h2>
+        <div class="max-w-4xl text-left space-y-8 bg-slate-900/50 p-12 rounded-[3rem] border border-blue-500/30">
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">🏛️</div>
+                <p class="text-2xl text-slate-300">票链业务是<span class="text-blue-400 font-black">金融机构（赣州银行）</span>主动拥抱新技术的典型案例。</p>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">🔗</div>
+                <p class="text-2xl text-slate-300">通过区块链建立的<span class="text-blue-400 font-black">信任共识</span>，让小微企业的小额票据拥有了大票般的流动性。</p>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">💰</div>
+                <p class="text-2xl text-slate-300">这种模式有效地促进了信用的跨层级穿透，是<span class="text-blue-400 font-black">普惠金融</span>落地的实战样本。</p>
+            </div>
+        </div>
+        <button onclick="location.reload()" class="mt-16 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black shadow-2xl hover:bg-slate-200 transition">重新开始学习</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 9;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            document.getElementById('progressBar').style.width = ((currentPage + 1) / totalPages * 100) + '%';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function checkQuiz(btn, isCorrect) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.quiz-feedback');
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerText = "✨ 正确！精准理解了该环节的核心逻辑。";
+                feedback.className = "quiz-feedback block mt-4 text-xl font-bold text-green-400 animate-bounce";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerText = "❌ 答错了。请回顾本节的知识解析或对照右侧模式图。";
+                feedback.className = "quiz-feedback block mt-4 text-xl font-bold text-red-400";
+            }
+        }
+
+        window.onload = updateUI;
+
+        // 键盘翻页支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
