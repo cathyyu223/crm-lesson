@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实战演练：餐饮企业客户特征分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 页面容器 */
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .text-huge { font-size: clamp(2.5rem, 6vw, 5.5rem); font-weight: 900; line-height: 1.1; text-align: center; }
+        .text-title { font-size: clamp(1.8rem, 4vw, 3.5rem); font-weight: 800; color: #10b981; margin-bottom: 2rem; text-align: center; }
+
+        .glass-card {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        /* 餐饮坐标轴样式 */
+        .axis-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3.5rem;
+            position: relative;
+            width: 100%;
+        }
+        .axis-label { width: 150px; font-weight: 900; color: #10b981; font-size: 1.2rem; }
+        .axis-line {
+            flex-grow: 1;
+            height: 2px;
+            background-image: linear-gradient(to right, #334155 50%, rgba(255,255,255,0) 0%);
+            background-position: bottom;
+            background-size: 15px 2px;
+            background-repeat: repeat-x;
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+        }
+        .axis-node {
+            width: 20px; height: 20px;
+            background: #10b981;
+            transform: rotate(45deg);
+            position: relative;
+            z-index: 10;
+            border: 2px solid #064e3b;
+        }
+        .node-text {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: rotate(-45deg) translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        /* 模拟 30组数据的落点 */
+        .data-dot {
+            width: 10px; height: 10px;
+            background: #facc15;
+            border: 1px solid #000;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -22px;
+            opacity: 0;
+            box-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+            transition: opacity 0.3s ease;
+        }
+
+        .cluster-area {
+            position: absolute;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 60px;
+            filter: blur(20px);
+            z-index: 5;
+            display: none;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .badge-step {
+            background: #10b981;
+            color: #020617;
+            padding: 0.2rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 900;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部进度指示 -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-900 z-[10001]">
+        <div id="progressBar" class="h-full bg-emerald-500 transition-all duration-500" style="width: 20%"></div>
+    </div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-900/40">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center text-center" id="p0">
+        <div class="mb-6">
+            <span class="text-emerald-400 text-6xl">📊</span>
+        </div>
+        <h1 class="text-huge mb-6">餐饮企业客户特征分析</h1>
+        <h2 class="text-4xl font-bold text-emerald-400/80 mb-10 italic">—— 真实数据驱动的画像实战 ——</h2>
+        <div class="glass-card max-w-3xl mx-auto">
+            <p class="text-2xl text-slate-300 font-light leading-relaxed">
+                我们将利用餐饮客户行为调研中的 <span class="text-emerald-400 font-bold">30 组样本数据</span>，演示寻找变量、搭建框架到聚类分析的全过程。
+            </p>
+        </div>
+        <button onclick="changePage(1)" class="mt-12 bg-emerald-600 px-16 py-6 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl">开始实战演练</button>
+    </section>
+
+    <!-- 1. 变量提取 -->
+    <section class="page-section" id="p1">
+        <div class="badge-step">步骤一：寻找餐饮关键变量</div>
+        <h2 class="text-title">基于原始数据维度提取</h2>
+        <div class="glass-card">
+            <p class="text-2xl mb-10 text-slate-200 text-center">通过对海量行为样本的交叉分析，我们锁定了最能区分行为差异的三个维度：</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 bg-slate-900/80 rounded-3xl border-b-8 border-emerald-500 text-center">
+                    <div class="text-5xl mb-4">💰</div>
+                    <h4 class="text-2xl font-bold text-emerald-400 mb-2">美食消费观</h4>
+                    <p class="text-slate-400 leading-relaxed">区分“性价比导向”与“品质信仰导向”的核心指标。</p>
+                </div>
+                <div class="p-8 bg-slate-900/80 rounded-3xl border-b-8 border-emerald-500 text-center">
+                    <div class="text-5xl mb-4">🔥</div>
+                    <h4 class="text-2xl font-bold text-emerald-400 mb-2">美食热衷度</h4>
+                    <p class="text-slate-400 leading-relaxed">衡量客户是“普通好吃嘴”还是“文化探索者”。</p>
+                </div>
+                <div class="p-8 bg-slate-900/80 rounded-3xl border-b-8 border-emerald-500 text-center">
+                    <div class="text-5xl mb-4">💵</div>
+                    <h4 class="text-2xl font-bold text-emerald-400 mb-2">月收入水平</h4>
+                    <p class="text-slate-400 leading-relaxed">决定了客户对价格变动的敏感度和支付天花板。</p>
+                </div>
+            </div>
+        </div>
+        <p class="text-xl text-slate-500 italic mt-4 text-center">※ 经分析：性别与年龄在该数据集下对点餐决策的影响力次之。</p>
+    </section>
+
+    <!-- 2. 框架搭建 -->
+    <section class="page-section" id="p2">
+        <div class="badge-step">步骤二：搭建分析框架</div>
+        <h2 class="text-title">餐饮特征三维坐标系</h2>
+        <div class="glass-card pt-12">
+            <div class="axis-row">
+                <div class="axis-label">月收入</div>
+                <div class="axis-line">
+                    <div class="axis-node"><span class="node-text">3k以下</span></div>
+                    <div class="axis-node"><span class="node-text">3k~6k</span></div>
+                    <div class="axis-node"><span class="node-text">6k~9k</span></div>
+                    <div class="axis-node"><span class="node-text">9k以上</span></div>
+                </div>
+            </div>
+            <div class="axis-row">
+                <div class="axis-label">美食消费观</div>
+                <div class="axis-line">
+                    <div class="axis-node"><span class="node-text">看场合消费</span></div>
+                    <div class="axis-node"><span class="node-text">追求性价比</span></div>
+                    <div class="axis-node"><span class="node-text">多贵都值(信仰)</span></div>
+                </div>
+            </div>
+            <div class="axis-row">
+                <div class="axis-label">美食热衷度</div>
+                <div class="axis-line">
+                    <div class="axis-node"><span class="node-text">文化熏陶</span></div>
+                    <div class="axis-node"><span class="node-text">普通好吃嘴</span></div>
+                    <div class="axis-node"><span class="node-text">极致探索</span></div>
+                </div>
+            </div>
+        </div>
+        <p class="text-xl text-slate-500 italic text-center">—— 坐标轴节点完全对应原始调查数据的分类项 ——</p>
+    </section>
+
+    <!-- 3. 聚类分析模拟 -->
+    <section class="page-section" id="p3">
+        <div class="badge-step">步骤三：进行聚类分析</div>
+        <h2 class="text-title">30 组样本数据导入模拟</h2>
+        <div class="glass-card relative overflow-hidden" style="min-height: 520px;">
+            <p class="text-xl text-slate-400 mb-8 text-center">系统正在自动将 30 位客户的行为数据映射至坐标系...</p>
+            
+            <div id="practicalAxes">
+                <div class="axis-row">
+                    <div class="axis-label">月收入</div>
+                    <div class="axis-line">
+                        <div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div>
+                        <div class="data-dot" style="left:38%"></div><div class="data-dot" style="left:39%; bottom:-32px"></div>
+                        <div class="data-dot" style="left:40%; bottom:-42px"></div><div class="data-dot" style="left:41%"></div>
+                        <div class="data-dot" style="left:12%"></div><div class="data-dot" style="left:88%"></div>
+                    </div>
+                </div>
+                <div class="axis-row">
+                    <div class="axis-label">消费观</div>
+                    <div class="axis-line">
+                        <div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div>
+                        <!-- 性价比群体 -->
+                        <div class="data-dot" style="left:48%"></div><div class="data-dot" style="left:49%; bottom:-32px"></div>
+                        <div class="data-dot" style="left:50%; bottom:-42px"></div><div class="data-dot" style="left:51%"></div>
+                        <div class="data-dot" style="left:52%; bottom:-32px"></div>
+                        <div class="data-dot" style="left:15%"></div><div class="data-dot" style="left:82%"></div>
+                    </div>
+                </div>
+                <div class="axis-row">
+                    <div class="axis-label">热衷度</div>
+                    <div class="axis-line">
+                        <div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div>
+                        <!-- 好吃嘴 -->
+                        <div class="data-dot" style="left:49%"></div><div class="data-dot" style="left:50%; bottom:-32px"></div>
+                        <div class="data-dot" style="left:51%; bottom:-42px"></div>
+                        <div class="data-dot" style="left:18%"></div><div class="data-dot" style="left:85%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 聚类核心区域 -->
+            <div id="cateringShadow" class="cluster-area" style="width: 260px; height: 440px; top: 10px; left: 340px;"></div>
+        </div>
+
+        <div class="flex gap-4">
+            <button onclick="runSimulation()" class="bg-blue-600 px-10 py-3 rounded-full font-black hover:bg-blue-500 transition">1. 标记样本落点</button>
+            <button onclick="runCluster()" class="bg-emerald-600 px-10 py-3 rounded-full font-black hover:bg-emerald-500 transition">2. 识别密集区域</button>
+        </div>
+    </section>
+
+    <!-- 4. 实战结论 -->
+    <section class="page-section" id="p4">
+        <div class="badge-step">实战分析结论</div>
+        <h2 class="text-title">典型餐饮客户画像生成</h2>
+        <div class="glass-card bg-emerald-900/10 border-emerald-500/30">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="flex-1">
+                    <h3 class="text-4xl font-black text-emerald-400 mb-6">“理性老饕”核心群</h3>
+                    <ul class="text-2xl space-y-5 text-slate-300">
+                        <li>🍱 <span class="text-white font-bold">画像定义：</span>月收入 3k-6k，对美食有一定追求的普通好吃嘴。</li>
+                        <li>💰 <span class="text-white font-bold">消费特征：</span>对价格变动敏感度高，极致追求性价比（单价敏感）。</li>
+                        <li>🚀 <span class="text-white font-bold">运营建议：</span>应主打“平价精致下午茶”或“高CP值工作餐”，通过买赠活动精准触达。</li>
+                    </ul>
+                </div>
+                <div class="w-72 h-72 bg-slate-800 rounded-full flex items-center justify-center text-7xl border-4 border-dashed border-emerald-500 shadow-2xl">
+                    🍜
+                </div>
+            </div>
+        </div>
+        <p class="text-xl text-slate-500 mt-6 italic text-center">—— 聚类区域覆盖了统计结果中 56.6% 的客户份额。</p>
+    </section>
+
+    <!-- 5. 总结 -->
+    <section class="page-section justify-center text-center" id="p5">
+        <h2 class="text-huge mb-10">案例演练总结</h2>
+        <div class="max-w-4xl text-left space-y-8 bg-slate-900/50 p-12 rounded-[3rem] border border-emerald-500/20">
+            <p class="text-2xl">✅ <b>数据洞察：</b>通过全量统计分析，我们发现“追求性价比”是该企业的核心利润基石。</p>
+            <p class="text-2xl">✅ <b>科学聚类：</b>不靠直觉猜测，而是靠样本点在坐标轴上的物理密度寻找群体规律。</p>
+            <p class="text-2xl">✅ <b>精准营销：</b>识别画像后，每一分广告费都能精准投向“理性老饕”这一最大权重群体。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-12 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black shadow-xl">重新开始演练</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 6;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            document.getElementById('progressBar').style.width = ((currentPage + 1) / totalPages * 100) + '%';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function runSimulation() {
+            const dots = document.querySelectorAll('.data-dot');
+            dots.forEach((dot, i) => {
+                setTimeout(() => dot.style.opacity = "1", i * 50);
+            });
+        }
+
+        function runCluster() {
+            document.getElementById('cateringShadow').style.display = "block";
+        }
+
+        window.onload = updateUI;
+
+        // 键盘控制
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
