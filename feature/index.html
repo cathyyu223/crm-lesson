@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户特征分析 - 交互式教学课件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-huge { font-size: clamp(2.5rem, 6vw, 5.5rem); font-weight: 900; line-height: 1.1; text-align: center; }
+        .text-title { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        /* 模拟分析框架样式 */
+        .axis-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+            width: 100%;
+        }
+        .axis-label { width: 120px; font-weight: 900; color: #38bdf8; font-size: 1.2rem; }
+        .axis-line {
+            flex-grow: 1;
+            height: 2px;
+            background: dashed #334155;
+            background-image: linear-gradient(to right, #334155 50%, rgba(255,255,255,0) 0%);
+            background-position: bottom;
+            background-size: 15px 1px;
+            background-repeat: repeat-x;
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+        }
+        .axis-node {
+            width: 20px;
+            height: 20px;
+            background: #475569;
+            transform: rotate(45deg);
+            position: relative;
+            z-index: 10;
+        }
+        .node-text {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: rotate(-45deg) translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* 数据点 */
+        .data-dot {
+            width: 8px;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* 聚类云 */
+        .cluster-cloud {
+            position: absolute;
+            background: rgba(56, 189, 248, 0.2);
+            border-radius: 50px;
+            filter: blur(15px);
+            z-index: 5;
+            display: none;
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: #38bdf8;
+            color: #020617;
+            padding: 0.2rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .quiz-container {
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38bdf8;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 1.3rem;
+        }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+    </style>
+</head>
+<body>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center" id="p0">
+        <h1 class="text-huge mb-6 text-white">5.3.3 客户画像建立</h1>
+        <h2 class="text-huge mb-10 text-blue-400 italic">客户特征分析实战解构</h2>
+        <div class="glass-card text-center">
+            <p class="text-2xl text-slate-300 font-light">只有进行合理的特征分析，企业才能得到科学的画像结果。</p>
+            <p class="text-xl text-slate-400 mt-4 italic">—— 寻找关键变量 · 搭建分析框架 · 进行聚类分析</p>
+        </div>
+        <button onclick="changePage(1)" class="mt-8 bg-blue-600 px-16 py-6 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl">开始实战</button>
+    </section>
+
+    <!-- 1. 寻找关键变量 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">步骤一：寻找关键变量</h2>
+        <div class="glass-card">
+            <span class="tech-badge">定义</span>
+            <p class="text-2xl mb-6 text-slate-200">关键变量是指导致客户对目标产品或服务的相关行为产生差异的<b>核心因素</b>。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 bg-slate-800 rounded-2xl border-l-8 border-blue-500">
+                    <h4 class="text-2xl font-bold mb-2">金融服务案例</h4>
+                    <p class="text-xl text-slate-400">关键变量：收入水平、消费观念、理财观念。</p>
+                    <p class="text-lg text-slate-500 mt-2 italic">注：性格、文化水平虽有影响但较小。</p>
+                </div>
+                <div class="p-6 bg-slate-800 rounded-2xl border-l-8 border-emerald-500">
+                    <h4 class="text-2xl font-bold mb-2">选取建议</h4>
+                    <p class="text-xl text-slate-400">通常情况下，企业需要选取 <span class="text-emerald-400 font-black">3~6 个</span> 关键变量来构建模型。</p>
+                </div>
+            </div>
+        </div>
+        <div class="quiz-container">
+            <p class="text-xl font-bold mb-4">【思考题】如果一家书店要分析客户特征，以下哪个最适合作为“关键变量”？</p>
+            <button class="quiz-option" onclick="checkQuiz(this, true)">A. 阅读偏好（严肃文学/职场提升/流行小说）</button>
+            <button class="quiz-option" onclick="checkQuiz(this, false)">B. 客户的血型与星座</button>
+            <p class="quiz-feedback hidden mt-4 font-bold text-green-400"></p>
+        </div>
+    </section>
+
+    <!-- 2. 搭建分析框架 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">步骤二：搭建分析框架</h2>
+        <div class="glass-card">
+            <p class="text-2xl mb-10 text-center">将每个关键变量作为一个维度，将各个客户信息与该维度对应。</p>
+            
+            <div class="axis-row">
+                <div class="axis-label">月收入水平</div>
+                <div class="axis-line">
+                    <div class="axis-node"><span class="node-text">3000元以下</span></div>
+                    <div class="axis-node"><span class="node-text">3000~5000元</span></div>
+                    <div class="axis-node"><span class="node-text">5001~7000元</span></div>
+                    <div class="axis-node"><span class="node-text">7000元以上</span></div>
+                </div>
+            </div>
+
+            <div class="axis-row">
+                <div class="axis-label">消费观念</div>
+                <div class="axis-line">
+                    <div class="axis-node"><span class="node-text">节约为上</span></div>
+                    <div class="axis-node"><span class="node-text">不做不必要消费</span></div>
+                    <div class="axis-node"><span class="node-text">追求消费品质</span></div>
+                    <div class="axis-node"><span class="node-text">“月光族”</span></div>
+                </div>
+            </div>
+
+            <div class="axis-row">
+                <div class="axis-label">理财观念</div>
+                <div class="axis-line">
+                    <div class="axis-node"><span class="node-text">视理财如骗局</span></div>
+                    <div class="axis-node"><span class="node-text">低收益低风险</span></div>
+                    <div class="axis-node"><span class="node-text">风险收益平衡</span></div>
+                    <div class="axis-node"><span class="node-text">追求高收益</span></div>
+                </div>
+            </div>
+        </div>
+        <p class="text-xl text-slate-500 italic">—— 模拟图片 5-13 所示的分析维度</p>
+    </section>
+
+    <!-- 3. 进行聚类分析 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">步骤三：进行聚类分析</h2>
+        <div class="glass-card relative overflow-hidden" style="min-height: 500px;">
+            <p class="text-xl text-slate-300 mb-10">通过在对应位置标记数据点，识别出“重合度更高”的特征区域。</p>
+            
+            <!-- 仿真交互区域 -->
+            <div id="clusteringArea" class="w-full">
+                <!-- 每一行手动放置点 -->
+                <div class="axis-row">
+                    <div class="axis-label">月收入</div>
+                    <div class="axis-line" id="row1">
+                        <div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div>
+                        <!-- 点阵 -->
+                        <div class="data-dot" style="left:10%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:38%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:40%; bottom:-25px;"></div>
+                        <div class="data-dot" style="left:42%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:65%; bottom:-15px;"></div>
+                    </div>
+                </div>
+                <div class="axis-row">
+                    <div class="axis-label">消费观念</div>
+                    <div class="axis-line" id="row2">
+                        <div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div>
+                        <div class="data-dot" style="left:15%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:62%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:65%; bottom:-25px;"></div>
+                        <div class="data-dot" style="left:68%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:90%; bottom:-15px;"></div>
+                    </div>
+                </div>
+                <div class="axis-row">
+                    <div class="axis-label">理财观念</div>
+                    <div class="axis-line" id="row3">
+                        <div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div><div class="axis-node"></div>
+                        <div class="data-dot" style="left:20%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:45%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:88%; bottom:-15px;"></div>
+                        <div class="data-dot" style="left:90%; bottom:-25px;"></div>
+                        <div class="data-dot" style="left:92%; bottom:-15px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 聚类云 (模拟图 5-15) -->
+            <div id="cloud" class="cluster-cloud" style="width: 200px; height: 400px; top: 50px; left: 450px; transform: rotate(-15deg);"></div>
+        </div>
+
+        <div class="flex gap-4">
+            <button onclick="simulateDots()" class="bg-blue-600 px-8 py-3 rounded-full font-bold">1. 标记数据 (模拟图 5-14)</button>
+            <button onclick="showCloud()" class="bg-emerald-600 px-8 py-3 rounded-full font-bold">2. 识别典型客户 (模拟图 5-15)</button>
+        </div>
+        
+        <div id="analysisResult" class="hidden mt-8 p-6 bg-emerald-900/30 border border-emerald-500 rounded-xl max-w-4xl text-center">
+            <p class="text-xl font-bold text-emerald-400">分析结论：本案例典型客户集中在“中等收入（3-5k）”、“追求消费品质”、“追求高收益”理财的交汇区域。</p>
+        </div>
+    </section>
+
+    <!-- 4. 总结 -->
+    <section class="page-section justify-center text-center" id="p4">
+        <h2 class="text-huge mb-10 text-white">教学小结</h2>
+        <div class="max-w-4xl text-left space-y-8 bg-slate-900/50 p-12 rounded-[3rem] border border-blue-500/20">
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">🔍</div>
+                <p class="text-2xl"><b>寻找变量：</b>排除次要属性，锁定核心影响因素。</p>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">🏗️</div>
+                <p class="text-2xl"><b>搭建框架：</b>将抽象的变量转化为可量化、可视化的坐标轴。</p>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">🎯</div>
+                <p class="text-2xl"><b>聚类分析：</b>通过数据点的分布密度，识别出最具商业价值的典型客户群。</p>
+            </div>
+        </div>
+        <button onclick="location.reload()" class="mt-16 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black">重新演示</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 5;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function checkQuiz(btn, isCorrect) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.querySelector('.quiz-feedback');
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerText = "✨ 回答正确！关键变量必须与业务高度相关且能产生行为差异。";
+                feedback.className = "quiz-feedback block mt-4 font-bold text-green-400 animate-bounce";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerText = "❌ 答错了。血型通常不直接决定购书决策。";
+                feedback.className = "quiz-feedback block mt-4 font-bold text-red-400";
+            }
+        }
+
+        // 聚类模拟函数
+        function simulateDots() {
+            const dots = document.querySelectorAll('.data-dot');
+            dots.forEach((dot, index) => {
+                setTimeout(() => {
+                    dot.style.opacity = "1";
+                }, index * 100);
+            });
+        }
+
+        function showCloud() {
+            document.getElementById('cloud').style.display = "block";
+            document.getElementById('analysisResult').classList.remove('hidden');
+        }
+
+        window.onload = updateUI;
+
+        // 键盘翻页支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
