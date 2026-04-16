@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预测分析法 - 交互式教学系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 页面切换动画 */
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            padding: 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 交互卡片样式 */
+        .method-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .method-card:hover {
+            border-color: #38bdf8;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.3);
+        }
+
+        /* 导航按钮 */
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.2rem;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        /* 题目选项样式 */
+        .quiz-option {
+            background: #334155;
+            border: 2px solid transparent;
+            padding: 1.2rem;
+            margin: 0.5rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover { background: #475569; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .progress-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; }
+        .progress-dot.active { background: #38bdf8; box-shadow: 0 0 10px #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <!-- 进度点 -->
+    <div class="fixed top-6 left-1/2 -translate-x-1/2 flex gap-3 z-[1001]" id="dotBar"></div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500 shadow-2xl">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center text-center" id="p0">
+        <div class="mb-8">
+            <svg class="w-32 h-32 text-blue-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        </div>
+        <h1 class="text-6xl md:text-8xl font-black mb-8">预测分析法</h1>
+        <p class="text-2xl text-slate-400 max-w-4xl leading-relaxed">
+            基于已知信息，使用定性和定量的手段，估计事物未来发展趋向。
+            <br><span class="text-blue-400 font-bold italic">—— 掌握这四把钥匙，看清商业迷雾。</span>
+        </p>
+        <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-5 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl">开始学习</button>
+    </section>
+
+    <!-- 1. 经验预测法 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-4xl font-black text-blue-400 mb-10">01. 经验预测法 (Experience)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full max-w-6xl">
+            <div class="method-card p-10">
+                <h3 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                    <span class="text-5xl">🧭</span> 核心要义
+                </h3>
+                <p class="text-xl leading-relaxed text-slate-300">
+                    依托于个体或企业在长期实践中积累的<span class="text-white font-bold">专业知识与实践经验</span>，综合分析历史案例与当前情境，预测未来行动的可能效果。
+                </p>
+            </div>
+            <div class="bg-blue-900/20 p-10 rounded-3xl border border-blue-500/30">
+                <h4 class="text-2xl font-bold mb-4 text-sky-300 underline">场景案例</h4>
+                <p class="text-xl italic">一位拥有10年以上销售经验的专家，仅通过观察客户进入门店时的微表情、询问的问题类型，就能准确预判其成单概率。这就是经验在起作用。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 类比预测法 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-4xl font-black text-emerald-400 mb-10">02. 类比预测法 (Analogy)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full max-w-6xl">
+            <div class="method-card p-10">
+                <h3 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                    <span class="text-5xl">⚖️</span> 核心要义
+                </h3>
+                <p class="text-xl leading-relaxed text-slate-300">
+                    根据某种事物的<span class="text-white font-bold">发展历程</span>来判断另一种新事物的发展趋势。即将已知事物的发展规律应用到未知事物的规律上。
+                </p>
+            </div>
+            <div class="bg-emerald-900/20 p-10 rounded-3xl border border-emerald-500/30">
+                <h4 class="text-2xl font-bold mb-4 text-emerald-300 underline">新产品评估</h4>
+                <p class="text-xl italic">企业推出新款无糖饮料前，会参考之前推出的果茶系列的受众反应。通过对比相似产品的市场接受度，预测新产品的销量走势。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 惯性预测法 -->
+    <section class="page-section" id="p3">
+        <h2 class="text-4xl font-black text-amber-400 mb-10">03. 惯性预测法 (Inertia)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full max-w-6xl">
+            <div class="method-card p-10">
+                <h3 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                    <span class="text-5xl">📈</span> 核心要义
+                </h3>
+                <p class="text-xl leading-relaxed text-slate-300">
+                    事物发展都有一定的惯性。利用事物发展的惯性对未来做出判断，典型的应用就是<span class="text-white font-bold">趋势分析</span>。
+                </p>
+            </div>
+            <div class="bg-amber-900/20 p-10 rounded-3xl border border-amber-500/30">
+                <h4 class="text-2xl font-bold mb-4 text-amber-300 underline">趋势推导</h4>
+                <p class="text-xl italic">某客户在过去6个月内，几乎每个月都稳定增加10%的采购预算。基于这种惯性，企业可以大胆判断下个月该客户的需求会进一步放大。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 逻辑关系预测法 -->
+    <section class="page-section" id="p4">
+        <h2 class="text-4xl font-black text-rose-400 mb-10">04. 逻辑关系预测法 (Logic)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full max-w-6xl">
+            <div class="method-card p-10">
+                <h3 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                    <span class="text-5xl">🔗</span> 核心要义
+                </h3>
+                <p class="text-xl leading-relaxed text-slate-300">
+                    基于事物之间的<span class="text-white font-bold">因果逻辑关系</span>，通过已知事物的状态变化，来推断另一个事物的状态变化。
+                </p>
+            </div>
+            <div class="bg-rose-900/20 p-10 rounded-3xl border border-rose-500/30">
+                <h4 class="text-2xl font-bold mb-4 text-rose-300 underline">精准营销</h4>
+                <p class="text-xl italic">基于“客户月收入与其消费能力成正比”的逻辑。当企业获得新客户的收入分位数据时，即可大致预估其潜在的消费天花板。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 实战测评 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title text-3xl font-black mb-10">🎓 实战测评：你能选对预测方法吗？</h2>
+        <div class="max-w-3xl w-full">
+            <div id="quizContainer">
+                <!-- 题目 1 -->
+                <div class="quiz-step" data-step="1">
+                    <p class="text-2xl font-bold mb-6">Q1: 企业通过观察智能手机普及率的上升规律，来预测可穿戴设备（如智能手表）未来的普及率。这属于哪种方法？</p>
+                    <button class="quiz-option" onclick="checkAnswer(this, '类比预测法')">经验预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '类比预测法', true)">类比预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '类比预测法')">惯性预测法</button>
+                </div>
+                <!-- 题目 2 -->
+                <div class="quiz-step hidden" data-step="2">
+                    <p class="text-2xl font-bold mb-6">Q2: 某房产经纪人凭借其对商圈15年的了解，直觉判定这栋写字楼下周会涨价。这属于哪种方法？</p>
+                    <button class="quiz-option" onclick="checkAnswer(this, '经验预测法', true)">经验预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '经验预测法')">逻辑关系预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '经验预测法')">惯性预测法</button>
+                </div>
+                <!-- 题目 3 -->
+                <div class="quiz-step hidden" data-step="3">
+                    <p class="text-2xl font-bold mb-6">Q3: 某公司发现油价上涨通常会导致其远途货运需求下降，并据此调整策略。这属于哪种方法？</p>
+                    <button class="quiz-option" onclick="checkAnswer(this, '逻辑关系预测法')">惯性预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '逻辑关系预测法', true)">逻辑关系预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '逻辑关系预测法')">类比预测法</button>
+                </div>
+                <!-- 题目 4 -->
+                <div class="quiz-step hidden" data-step="4">
+                    <p class="text-2xl font-bold mb-6">Q4: 某客户在最近三个月的月中都会准时通过App续费会员，系统自动预测其下月中旬也会续费。这属于哪种方法？</p>
+                    <button class="quiz-option" onclick="checkAnswer(this, '惯性预测法', true)">惯性预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '惯性预测法')">经验预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '惯性预测法')">类比预测法</button>
+                </div>
+                <!-- 题目 5 -->
+                <div class="quiz-step hidden" data-step="5">
+                    <p class="text-2xl font-bold mb-6">Q5: 预测分析法中，基于“因果逻辑”来推断事物状态的方法被称为？</p>
+                    <button class="quiz-option" onclick="checkAnswer(this, '逻辑关系预测法')">经验预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '逻辑关系预测法', true)">逻辑关系预测法</button>
+                    <button class="quiz-option" onclick="checkAnswer(this, '逻辑关系预测法')">惯性预测法</button>
+                </div>
+            </div>
+            <p id="quizFeedback" class="mt-6 text-xl font-bold hidden text-center p-4 rounded-xl"></p>
+        </div>
+    </section>
+
+    <!-- 6. 总结 -->
+    <section class="page-section justify-center text-center" id="p6">
+        <h2 class="text-huge text-5xl font-black mb-10 text-white">教学总结</h2>
+        <div class="max-w-4xl text-left space-y-6 bg-slate-900/50 p-10 rounded-3xl border border-blue-500/20">
+            <p class="text-2xl">🧠 <span class="text-blue-400 font-black">经验法：</span>看专家直觉与历史积淀。</p>
+            <p class="text-2xl">⚖️ <span class="text-emerald-400 font-black">类比法：</span>看相似事物的发展映射。</p>
+            <p class="text-2xl">📈 <span class="text-amber-400 font-black">惯性法：</span>看当前趋势的自然延伸。</p>
+            <p class="text-2xl">🔗 <span class="text-rose-400 font-black">逻辑法：</span>看变量之间的因果关联。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-12 bg-white text-slate-900 px-12 py-5 rounded-full text-2xl font-black shadow-2xl hover:scale-105 transition">重新开始</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 7;
+        let currentQuizStep = 1;
+
+        // 初始化指示点
+        const dotBar = document.getElementById('dotBar');
+        for(let i=0; i<totalPages; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+            dot.id = 'dot-' + i;
+            dotBar.appendChild(dot);
+        }
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = (currentPage === totalPages - 1) ? 'none' : 'block';
+            
+            // 更新小点
+            document.querySelectorAll('.progress-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentPage);
+            });
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function checkAnswer(btn, correctLabel, isCorrect = false) {
+            const stepContainer = btn.parentElement;
+            if (stepContainer.dataset.answered === "true") return;
+            stepContainer.dataset.answered = "true";
+
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+
+            const options = stepContainer.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.style.opacity = "0.5");
+            btn.style.opacity = "1";
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.innerHTML = "✨ 回答正确！精准匹配预测逻辑。";
+                feedback.className = "mt-6 text-xl font-bold text-green-400 bg-green-900/20 p-4 rounded-xl block";
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerHTML = "❌ 答错了。正确答案是：" + correctLabel;
+                feedback.className = "mt-6 text-xl font-bold text-red-400 bg-red-900/20 p-4 rounded-xl block";
+            }
+
+            // 延迟进入下一题
+            setTimeout(() => {
+                if (currentQuizStep < 5) {
+                    stepContainer.classList.add('hidden');
+                    currentQuizStep++;
+                    document.querySelector(`[data-step="${currentQuizStep}"]`).classList.remove('hidden');
+                    feedback.classList.add('hidden');
+                } else {
+                    feedback.innerHTML = "🎊 测评结束！正在生成总结报告...";
+                    setTimeout(() => changePage(1), 1500);
+                }
+            }, 2000);
+        }
+
+        window.onload = updateUI;
+
+        // 键盘翻页支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
