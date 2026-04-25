@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户分级管理制度：理论与决策实战</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-huge { font-size: clamp(2.5rem, 6vw, 5.5rem); font-weight: 900; line-height: 1.1; text-align: center; }
+        .text-title { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+        }
+
+        .grade-tag {
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 900;
+            margin-right: 0.5rem;
+        }
+        .tag-a { background: #facc15; color: #422006; }
+        .tag-b { background: #38bdf8; color: #082f49; }
+        .tag-c { background: #94a3b8; color: #0f172a; }
+        .tag-d { background: #f87171; color: #450a0a; }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        /* 题目样式 */
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin: 0.8rem 0;
+            border-radius: 1rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 1.5rem;
+            transition: 0.2s;
+        }
+        .quiz-option:hover { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; }
+        .correct { background: #064e3b !important; border-color: #10b981 !important; }
+        .wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .feedback-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            font-weight: bold;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 6px;
+            background: #38bdf8;
+            z-index: 10001;
+            transition: width 0.4s ease;
+        }
+
+        .badge {
+            background: #38bdf8;
+            color: #020617;
+            padding: 0.2rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center" id="p0">
+        <h1 class="text-huge mb-6 text-white">客户分级管理</h1>
+        <h2 class="text-huge text-blue-400 italic mb-10">—— 制度解析与决策实战 ——</h2>
+        <div class="glass-card text-center">
+            <p class="text-2xl text-slate-300 font-light leading-relaxed">
+                企业资源是有限的，客户价值是不等的。<br>
+                我们将深入解析如何通过 8 大维度进行客户“画像”与等级评定。
+            </p>
+        </div>
+        <button onclick="changePage(1)" class="mt-8 bg-blue-600 px-16 py-6 rounded-full text-2xl font-black hover:scale-110 transition shadow-2xl">开启管理智慧</button>
+    </section>
+
+    <!-- 1. 计分指标解析 -->
+    <section class="page-section" id="p1">
+        <div class="badge">知识讲解 01</div>
+        <h2 class="text-title">核心维度：100分计分体系</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl">
+            <div class="glass-card p-6 border-b-4 border-yellow-500">
+                <h4 class="text-2xl font-bold mb-2 text-yellow-400">1. 销售规模</h4>
+                <p class="text-slate-400 text-xl">年度采购总金额，决定了客户的基本盘。</p>
+            </div>
+            <div class="glass-card p-6 border-b-4 border-emerald-500">
+                <h4 class="text-2xl font-bold mb-2 text-emerald-400">2. 付款信誉</h4>
+                <p class="text-slate-400 text-xl">回款及时率。信誉差的客户级别应一票否决。</p>
+            </div>
+            <div class="glass-card p-6 border-b-4 border-blue-500">
+                <h4 class="text-2xl font-bold mb-2 text-blue-400">3. 产品利润率</h4>
+                <p class="text-slate-400 text-xl">客户不仅要有规模，更要有盈利贡献。</p>
+            </div>
+            <div class="glass-card p-6 border-b-4 border-purple-500">
+                <h4 class="text-2xl font-bold mb-2 text-purple-400">4. 经营历史</h4>
+                <p class="text-slate-400 text-xl">合作年份长短体现了关系的稳定性。</p>
+            </div>
+        </div>
+        <p class="text-xl text-slate-500 mt-10 italic">—— 计分项还包括：产品订量、销售模式、JP产品占比、行业知名度等。</p>
+    </section>
+
+    <!-- 2. 分级比例 -->
+    <section class="page-section" id="p2">
+        <div class="badge">知识讲解 02</div>
+        <h2 class="text-title">比例分配：帕累托原则应用</h2>
+        <div class="glass-card flex flex-col md:flex-row items-center gap-12">
+            <div class="flex-1 space-y-6 text-2xl">
+                <p><span class="grade-tag tag-a">A类 (前20%)</span> 重点保护对象，核心支柱。</p>
+                <p><span class="grade-tag tag-b">B类 (下30%)</span> 潜在大客户，需全力挖掘。</p>
+                <p><span class="grade-tag tag-c">C类 (下40%)</span> 基础维持客户，按标准执行。</p>
+                <p><span class="grade-tag tag-d">D类 (末10%)</span> 观察限制对象，需提高毛利。</p>
+            </div>
+            <div class="w-80 h-80 border-8 border-dashed border-blue-500/20 rounded-full flex items-center justify-center relative">
+                <div class="text-center font-black text-blue-400 text-3xl">二八<br>定律</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 差异化政策：价格与账期 -->
+    <section class="page-section" id="p3">
+        <div class="badge">知识讲解 03</div>
+        <h2 class="text-title">管理矩阵：商务条件差异化</h2>
+        <div class="glass-card overflow-hidden">
+            <table class="w-full text-left text-2xl">
+                <thead class="bg-blue-900/50">
+                    <tr>
+                        <th class="p-6">管理项</th>
+                        <th class="p-6 text-yellow-400">A类核心客户</th>
+                        <th class="p-6 text-slate-300">C/D类一般客户</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700">
+                    <tr>
+                        <td class="p-6 font-bold">价格控制</td>
+                        <td class="p-6">优惠 5% 以内</td>
+                        <td class="p-6 text-red-400">提价 5% 或不低于内控价</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6 font-bold">付款账期</td>
+                        <td class="p-6">放宽至交货后 3 个月</td>
+                        <td class="p-6">严格按合同，先款后货优先</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 4. 差异化政策：生产交付 -->
+    <section class="page-section" id="p4">
+        <div class="badge">知识讲解 04</div>
+        <h2 class="text-title">管理矩阵：交付保障差异化</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-6xl">
+            <div class="glass-card bg-blue-900/10">
+                <h3 class="text-3xl font-black text-blue-400 mb-6">⚡ 交期优先权</h3>
+                <ul class="space-y-4 text-2xl text-slate-300">
+                    <li>● A类常规单：<span class="text-white font-bold">20天内</span></li>
+                    <li>● B类常规单：<span class="text-white font-bold">30天内</span></li>
+                    <li>● C类常规单：<span class="text-slate-400">40天内</span></li>
+                </ul>
+            </div>
+            <div class="glass-card bg-emerald-900/10">
+                <h3 class="text-3xl font-black text-emerald-400 mb-6">🏗️ 生产来源</h3>
+                <p class="text-2xl text-slate-300 leading-relaxed">
+                    <b>A类/B类：</b>严禁外购，必须本厂生产以确保品质一致性。<br><br>
+                    <b>C类/D类：</b>产能受限时可采取外购（外协加工）。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 题目 Q1 -->
+    <section class="page-section" id="p5">
+        <div class="badge">实战案例考核 01</div>
+        <h2 class="text-title">决策冲突处理</h2>
+        <div class="glass-card">
+            <p class="text-2xl font-bold mb-8">Q1: 公司产能极度饱和。此时 A 类客户有一份常规单，而 C 类客户愿意加价 10% 签一份急单。根据制度，你应如何决策？</p>
+            <div class="quiz-container">
+                <button class="quiz-option" onclick="checkQuiz(this, true, '解析：遵循“A类优先、C类让步”原则。制度明确规定 A 类常规单交期必须保证在 20 天内且允许插单。盲目接 C 类加急单会挤占核心客户资源，破坏品牌长期信用。')">A. 坚守 A 类优先，按 20 天交货；C 类急单视生产状况，甚至不接</button>
+                <button class="quiz-option" onclick="checkQuiz(this, false, '解析：错误。虽然短期利润诱人，但违反了分级管理制度中“核心客户优先”的基石理念。')">B. 先接 C 类加急单以获取更高利润，A 类单稍作延后</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 6. 题目 Q2 -->
+    <section class="page-section" id="p6">
+        <div class="badge">实战案例考核 02</div>
+        <h2 class="text-title">价格权限边界</h2>
+        <div class="glass-card">
+            <p class="text-2xl font-bold mb-8">Q2: 某 B 类客户由于其行业地位上升，产品利润率极高，且 JP 产品占比超过 50%。该客户想申请 5% 的价格优惠。根据制度你应？</p>
+            <div class="quiz-container">
+                <button class="quiz-option" onclick="checkQuiz(this, false, '解析：不合规。制度规定 B 类客户的优惠上限仅为 3%。')">A. 立即同意 5% 优惠，因为他很有潜力</button>
+                <button class="quiz-option" onclick="checkQuiz(this, true, '解析：合规。制度规定 B 类优惠上限是 3%。若要享受 5% 优惠，必须等明年度正式晋升为 A 类。这体现了制度的严肃性。')">B. 最多给予 3% 优惠，并鼓励其通过扩大规模在明年度正式晋升为 A 类</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 7. 题目 Q3 -->
+    <section class="page-section" id="p7">
+        <div class="badge">实战案例考核 03</div>
+        <h2 class="text-title">财务风险控制</h2>
+        <div class="glass-card">
+            <p class="text-2xl font-bold mb-8">Q3: 在付款账期上，A 类客户可以获得 3 个月的放宽。这一政策实施的【前置先决条件】是什么？</p>
+            <div class="quiz-container">
+                <button class="quiz-option" onclick="checkQuiz(this, true, '解析：正确。制度第 4 条明确：所有账期放宽的前提都是“保证收款安全”。等级特权不能逾越风险控制底线。')">A. 保证收款安全</button>
+                <button class="quiz-option" onclick="checkQuiz(this, false, '解析：错误。等级并非无条件的豁免证。')">B. 仅看客户等级，A 类可以无条件延迟付款</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 8. 题目 Q4 -->
+    <section class="page-section" id="p8">
+        <div class="badge">实战案例考核 04</div>
+        <h2 class="text-title">品质延续性原则</h2>
+        <div class="glass-card">
+            <p class="text-2xl font-bold mb-8">Q4: 基于“品质一致性”，哪两类客户的订单被严格禁止采取外购（外协加工）形式？</p>
+            <div class="quiz-container">
+                <button class="quiz-option" onclick="checkQuiz(this, true, '解析：正确。制度第 7 条规定：为保证品质一致性和延续性，A 类和 B 类客户订单原则上不采取外购形式。')">A. A 类与 B 类</button>
+                <button class="quiz-option" onclick="checkQuiz(this, false, '解析：错误。C 类、D 类在产能不足时是可以借助其他厂能力保证供货稳定的。')">B. C 类与 D 类</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 9. 题目 Q5 -->
+    <section class="page-section" id="p9">
+        <div class="badge">实战案例考核 05</div>
+        <h2 class="text-title">渠道资格限制</h2>
+        <div class="glass-card">
+            <p class="text-2xl font-bold mb-8">Q5: C 类和 D 类客户在营销支持和代理资格上的规定是？</p>
+            <div class="quiz-container">
+                <button class="quiz-option" onclick="checkQuiz(this, true, '解析：正确。制度第 8 条明确规定：取消 C 类、D 类客户内销代理资格。这是为了将代理资源集中于高信誉、高贡献的 A/B 类客户。')">A. 取消内销代理资格</button>
+                <button class="quiz-option" onclick="checkQuiz(this, false, '解析：错误。这种支持通常只针对高等级代理。')">B. 每年给予销售额 1% 的广告支持</button>
+            </div>
+            <div class="feedback-box"></div>
+        </div>
+    </section>
+
+    <!-- 10. 总结 -->
+    <section class="page-section justify-center text-center" id="p10">
+        <h2 class="text-huge mb-10">教学总结</h2>
+        <div class="max-w-4xl text-left space-y-8 bg-slate-900/50 p-12 rounded-[3rem] border border-blue-500/20 shadow-2xl">
+            <p class="text-2xl">✅ <b>分级的核心：</b>通过 8 大维度计分，识别客户的“含金量”。</p>
+            <p class="text-2xl">✅ <b>管理的逻辑：</b>不是歧视小客户，而是将战略资源聚焦在 20% 的利润贡献者身上。</p>
+            <p class="text-2xl text-blue-400 font-bold">客户分级不是一成不变的，年度动态考核是维持制度活力的关键。</p>
+        </div>
+        <button onclick="location.reload()" class="mt-12 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black hover:scale-105 transition">重新学习</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 11;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            document.getElementById('progressBar').style.width = ((currentPage + 1) / totalPages * 100) + '%';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        function checkQuiz(btn, isCorrect, explanation) {
+            const container = btn.closest('.quiz-container');
+            const feedback = container.nextElementSibling;
+            
+            if (container.dataset.answered === "true") return;
+            container.dataset.answered = "true";
+
+            const options = container.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.style.opacity = "0.5");
+            btn.style.opacity = "1";
+
+            feedback.style.display = "block";
+            feedback.innerHTML = explanation;
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.classList.add('bg-green-900/30', 'text-green-400', 'animate-pulse');
+            } else {
+                btn.classList.add('wrong');
+                feedback.classList.add('bg-red-900/30', 'text-red-400');
+            }
+        }
+
+        window.onload = updateUI;
+
+        // 键盘控制
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
