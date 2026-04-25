@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户分级管理：全层级数据透视与决策可视化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        :root {
+            --grade-a: #facc15;
+            --grade-b: #38bdf8;
+            --grade-c: #94a3b8;
+            --grade-d: #f87171;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #020617;
+            color: #f1f5f9;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .page-section {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            padding: 2rem 2rem 8rem 2rem;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        .page-section.active {
+            display: flex !important;
+            animation: pageFadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: scale(1.01) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .text-title { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 800; color: #38bdf8; margin-bottom: 2rem; text-align: center; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 2rem;
+        }
+
+        .grade-pill {
+            padding: 0.3rem 1.2rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        .bg-a { background: var(--grade-a); color: #422006; }
+        .bg-b { background: var(--grade-b); color: #082f49; }
+        .bg-c { background: var(--grade-c); color: #0f172a; }
+        .bg-d { background: var(--grade-d); color: #450a0a; }
+
+        /* 柱状图样式 */
+        .chart-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            height: 200px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #334155;
+        }
+        .bar {
+            flex: 1;
+            border-radius: 8px 8px 0 0;
+            transition: height 1s ease-out;
+            position: relative;
+        }
+        .bar-label {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .nav-btn {
+            position: fixed;
+            bottom: 2.5rem;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .calc-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+        }
+
+        .formula-text {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 进度条 -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-900 z-[10001]">
+        <div id="progressBar" class="h-full bg-blue-500 transition-all duration-500" style="width: 14.2%"></div>
+    </div>
+
+    <!-- 导航按钮 -->
+    <button id="prevBtn" onclick="changePage(-1)" class="nav-btn left-10 bg-slate-800 text-slate-400 hover:text-white" style="display:none">← 上一步</button>
+    <button id="nextBtn" onclick="changePage(1)" class="nav-btn right-10 bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/40">下一步 →</button>
+
+    <!-- 0. 封面 -->
+    <section class="page-section active justify-center text-center" id="p0">
+        <div class="mb-6"><span class="text-7xl">📊</span></div>
+        <h1 class="text-huge mb-6 text-white leading-tight">客户分级全维解构</h1>
+        <h2 class="text-3xl font-bold text-blue-400 italic mb-10">—— A/B/C/D 全层级计算推导实战 ——</h2>
+        <div class="glass-card max-w-3xl mx-auto">
+            <p class="text-2xl text-slate-300 font-light leading-relaxed">
+                我们将通过四个真实的客户样本，深度还原从“平均订单金额”到“最终评级”的每一个计算细节，揭示二八法则背后的数据真相。
+            </p>
+        </div>
+        <button onclick="changePage(1)" class="mt-12 bg-blue-600 px-16 py-6 rounded-full text-2xl font-black hover:scale-105 transition shadow-2xl">开启数据解析</button>
+    </section>
+
+    <!-- 1. 全量数据分布看板 -->
+    <section class="page-section" id="p1">
+        <h2 class="text-title">数据全景：利润贡献对比</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 w-full max-w-7xl">
+            <!-- 饼图 -->
+            <div class="glass-card flex flex-col items-center">
+                <h3 class="text-2xl font-bold mb-6">客户层级分布</h3>
+                <svg viewBox="0 0 100 100" class="w-64 h-64 transform -rotate-90">
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--grade-a)" stroke-width="12" stroke-dasharray="20 80" stroke-dashoffset="0"></circle>
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--grade-b)" stroke-width="12" stroke-dasharray="30 70" stroke-dashoffset="-20"></circle>
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--grade-c)" stroke-width="12" stroke-dasharray="40 60" stroke-dashoffset="-50"></circle>
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--grade-d)" stroke-width="12" stroke-dasharray="10 90" stroke-dashoffset="-90"></circle>
+                </svg>
+                <div class="mt-6 grid grid-cols-2 gap-4 text-sm font-bold">
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-[var(--grade-a)]"></div> A类 (20%)</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-[var(--grade-b)]"></div> B类 (30%)</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-[var(--grade-c)]"></div> C类 (40%)</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-[var(--grade-d)]"></div> D类 (10%)</div>
+                </div>
+            </div>
+            <!-- 柱状图 -->
+            <div class="glass-card flex flex-col">
+                <h3 class="text-2xl font-bold mb-10 text-center">单体年度利润贡献均值</h3>
+                <div class="chart-row px-10">
+                    <div class="bar bg-[var(--grade-a)]" style="height: 100%"><span class="bar-label">352万</span></div>
+                    <div class="bar bg-[var(--grade-b)]" style="height: 28%"><span class="bar-label">99万</span></div>
+                    <div class="bar bg-[var(--grade-c)]" style="height: 7%"><span class="bar-label">25万</span></div>
+                    <div class="bar bg-[var(--grade-d)]" style="height: 1.5%"><span class="bar-label">5万</span></div>
+                </div>
+                <div class="flex justify-between px-6 mt-4 font-bold text-slate-500">
+                    <span>A级(高端)</span><span>B级(重要)</span><span>C级(普通)</span><span>D级(长尾)</span>
+                </div>
+                <p class="mt-8 text-center text-xl text-blue-400 italic font-bold">数据结论：A类客户的价值是D类的 70 倍。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. A类案例推导 -->
+    <section class="page-section" id="p2">
+        <h2 class="text-title">A类标杆解析：XD-075 (战略支柱)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl">
+            <div class="calc-box">
+                <h3 class="text-2xl font-black text-yellow-400 mb-6">1. 原始数据审计</h3>
+                <ul class="text-xl space-y-4">
+                    <li>● 订单平均单价：<span class="text-white font-bold">￥ 117</span></li>
+                    <li>● 单个利润贡献：<span class="text-white font-bold">￥ 116.41</span></li>
+                    <li>● 年度订单数量：<span class="text-white font-bold">30,240 件</span></li>
+                    <li>● 回款周期：<span class="text-emerald-400 font-bold">28 天 (信誉优)</span></li>
+                </ul>
+            </div>
+            <div class="calc-box border-yellow-500/30">
+                <h3 class="text-2xl font-black text-yellow-400 mb-6">2. 结论计算过程</h3>
+                <div class="space-y-4 text-xl">
+                    <p>● <span class="formula-text">总额</span> = 117 × 30,240 = <b class="text-yellow-400">￥ 3,538,080</b></p>
+                    <p>● <span class="formula-text">总利润</span> = 116.41 × 30,240 = <b class="text-yellow-400">￥ 3,520,320</b></p>
+                    <p>● 利润率：<span class="text-emerald-400">99.5%</span> (核心高溢价产品)</p>
+                    <div class="grade-pill bg-a mt-4">最终评级：A类 (高端核心)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. B类案例推导 (新增) -->
+    <section class="page-section" id="p3">
+        <h2 class="text-title">B类重要解析：XD-071 (中坚力量)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl">
+            <div class="calc-box">
+                <h3 class="text-2xl font-black text-blue-400 mb-6">1. 原始数据审计</h3>
+                <ul class="text-xl space-y-4">
+                    <li>● 订单平均单价：<span class="text-white font-bold">￥ 113</span></li>
+                    <li>● 单个利润贡献：<span class="text-white font-bold">￥ 96.83</span></li>
+                    <li>● 年度订单数量：<span class="text-white font-bold">10,258 件</span></li>
+                    <li>● 回款周期：<span class="text-blue-400 font-bold">35 天 (信誉良)</span></li>
+                </ul>
+            </div>
+            <div class="calc-box border-blue-500/30">
+                <h3 class="text-2xl font-black text-blue-400 mb-6">2. 结论计算过程</h3>
+                <div class="space-y-4 text-xl">
+                    <p>● <span class="formula-text">总额</span> = 113 × 10,258 = <b class="text-blue-400">￥ 1,159,154</b></p>
+                    <p>● <span class="formula-text">总利润</span> = 96.83 × 10,258 = <b class="text-blue-400">￥ 993,272</b></p>
+                    <p>● 地位：百万级贡献，是A类梯队的首席后备。</p>
+                    <div class="grade-pill bg-b mt-4">最终评级：B类 (重要客户)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. C类案例推导 (新增) -->
+    <section class="page-section" id="p4">
+        <h2 class="text-title">C类普通解析：XD-051 (基础维持)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl">
+            <div class="calc-box">
+                <h3 class="text-2xl font-black text-slate-400 mb-6">1. 原始数据审计</h3>
+                <ul class="text-xl space-y-4 text-slate-300">
+                    <li>● 订单平均单价：<span class="text-white font-bold">￥ 100</span></li>
+                    <li>● 单个利润贡献：<span class="text-white font-bold">￥ 80.59</span></li>
+                    <li>● 年度订单数量：<span class="text-white font-bold">3,120 件</span></li>
+                    <li>● 回款周期：<span class="text-slate-400 font-bold">42 天 (信誉一般)</span></li>
+                </ul>
+            </div>
+            <div class="calc-box border-slate-500/30">
+                <h3 class="text-2xl font-black text-slate-400 mb-6">2. 结论计算过程</h3>
+                <div class="space-y-4 text-xl">
+                    <p>● <span class="formula-text">总额</span> = 100 × 3,120 = <b class="text-slate-200">￥ 312,000</b></p>
+                    <p>● <span class="formula-text">总利润</span> = 80.59 × 3,120 = <b class="text-slate-200">￥ 251,462</b></p>
+                    <p>● 性质：现金流支撑，是企业日常运营的盘底客群。</p>
+                    <div class="grade-pill bg-c mt-4">最终评级：C类 (普通客户)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. D类案例推导 -->
+    <section class="page-section" id="p5">
+        <h2 class="text-title">D类长尾解析：XD-068 (负荷预警)</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl">
+            <div class="calc-box opacity-70">
+                <h3 class="text-2xl font-black text-red-400 mb-6">1. 原始数据审计</h3>
+                <ul class="text-xl space-y-4">
+                    <li>● 订单单价：<span class="text-white font-bold">￥ 109</span></li>
+                    <li>● 年度订单数量：<span class="text-white font-bold">471 件</span></li>
+                    <li>● 回款周期：<span class="text-red-500 font-bold">142 天 (信誉差)</span></li>
+                </ul>
+            </div>
+            <div class="calc-box border-red-500/30">
+                <h3 class="text-2xl font-black text-red-400 mb-6">2. 财务负荷计算</h3>
+                <div class="space-y-4 text-xl">
+                    <p>● <span class="formula-text">总利润</span> = 107.61 × 471 = <b class="text-white">￥ 50,685</b></p>
+                    <p>● 风险：142天回款周期占用了极高的财务行政成本。</p>
+                    <p>● 策略建议：<span class="text-red-400 font-bold">取消账期或提高定价</span>。</p>
+                    <div class="grade-pill bg-d mt-4">最终评级：D类 (长尾长欠)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. 教学总结 -->
+    <section class="page-section justify-center text-center" id="p6">
+        <h2 class="text-huge mb-10 text-white">实战解析总结</h2>
+        <div class="max-w-4xl text-left space-y-8 bg-slate-900/50 p-12 rounded-[3rem] border border-blue-500/20 shadow-2xl">
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">📐</div>
+                <p class="text-2xl text-slate-300"><b>量级决胜：</b>通过 XD-075 与 XD-068 的对比，我们发现 A 类客户的年度贡献是 D 类的 <span class="text-blue-400 font-black">70 倍</span>，这证明了分级管理的必要性。</p>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">🚀</div>
+                <p class="text-2xl text-slate-300"><b>梯度管理：</b>B 类客户（XD-071）是利润的增长引擎，应投入资源将其“A类化”；而 C 类客户（XD-051）应推行自动化维护以控制成本。</p>
+            </div>
+            <div class="flex gap-6 items-start">
+                <div class="text-4xl">⚖️</div>
+                <p class="text-2xl text-slate-300"><b>科学定级：</b>不再根据主观印象，而是依靠<span class="text-blue-400 font-black">总额、利润、回款风险</span>三大定量指标实现科学资源分配。</p>
+            </div>
+        </div>
+        <button onclick="location.reload()" class="mt-16 bg-white text-slate-900 px-14 py-5 rounded-full text-2xl font-black hover:scale-105 transition">重新回顾全层级推导</button>
+    </section>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 7;
+
+        function updateUI() {
+            document.getElementById('prevBtn').style.display = currentPage === 0 ? 'none' : 'block';
+            document.getElementById('nextBtn').style.display = currentPage === totalPages - 1 ? 'none' : 'block';
+            document.getElementById('progressBar').style.width = ((currentPage + 1) / totalPages * 100) + '%';
+        }
+
+        function changePage(delta) {
+            const currentEl = document.getElementById('p' + currentPage);
+            if (currentEl) currentEl.classList.remove('active');
+            
+            currentPage += delta;
+            if (currentPage < 0) currentPage = 0;
+            if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+            const nextEl = document.getElementById('p' + currentPage);
+            if (nextEl) {
+                nextEl.classList.add('active');
+                nextEl.scrollTop = 0;
+            }
+            updateUI();
+        }
+
+        window.onload = updateUI;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changePage(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+        });
+    </script>
+</body>
+</html>
