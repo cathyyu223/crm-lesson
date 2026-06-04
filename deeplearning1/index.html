@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRF财务异常检测系统 (演示终端)</title>
+    
+    <!-- 引入 Tailwind CSS (CDN) 用于快速布局和样式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Lucide 图标库 (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- 引入 Marked.js 用于渲染 AI 生成的 Markdown 报告 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- 配置 Tailwind Typography 插件以便更好地渲染 Markdown 文本 -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+    <style>
+        /* 自定义向上浮现的动画 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { 
+            animation: fadeInUp 0.3s ease-out forwards; 
+        }
+        
+        /* 隐藏日志框的滚动条，保持界面整洁，但保留滚动功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 优化 Markdown 渲染内容的样式间距 */
+        .prose p { margin-top: 0.5em; margin-bottom: 0.5em; }
+        .prose h3, .prose h4 { margin-top: 1em; margin-bottom: 0.5em; color: #3730a3; }
+        .prose ul { margin-top: 0.5em; margin-bottom: 0.5em; }
+        .prose li { margin-top: 0.25em; margin-bottom: 0.25em; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 p-4 md:p-6 font-sans text-slate-800">
+
+    <!-- 头部标题区 -->
+    <header class="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-6 rounded-xl shadow-sm border border-slate-100 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                <i data-lucide="activity" class="text-blue-600"></i>
+                基于DRF的财务异常检测系统 (演示终端)
+            </h1>
+            <p class="text-slate-500 mt-1 text-sm">
+                Research and Application of Financial Anomaly Detection Algorithm Based on Machine Learning
+            </p>
+        </div>
+        <div class="flex gap-4">
+            <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 text-center">
+                <div class="text-xs text-blue-500 font-semibold uppercase tracking-wider">系统状态</div>
+                <div class="text-xl font-bold text-blue-700">在线监控中</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- 左侧：输入数据源区 -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex-1">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-700">
+                    <i data-lucide="database" class="w-5 h-5 text-blue-500"></i>
+                    1. 实时交易数据流 (输入端)
+                </h2>
+                
+                <!-- 交易列表容器 -->
+                <div id="tx-list" class="space-y-3"></div>
+                
+                <!-- 按钮容器 -->
+                <div id="btn-container"></div>
+            </div>
+        </div>
+
+        <!-- 中间：算法可视化区 -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+            <h2 class="text-lg font-bold mb-6 flex items-center gap-2 text-slate-700">
+                <i data-lucide="network" class="w-5 h-5 text-purple-500"></i>
+                2. 深度随机森林 (DRF) 算法流水线
+            </h2>
+            
+            <div class="flex-1 flex flex-col items-center justify-start py-8 relative">
+                <!-- 算法流水线节点容器 -->
+                <div id="pipeline-container" class="flex w-full items-center justify-between px-2 md:px-8 mb-8"></div>
+
+                <!-- 结果显示区容器 -->
+                <div id="result-container" class="w-full max-w-xl flex flex-col justify-start"></div>
+            </div>
+
+            <!-- 底部日志面板 -->
+            <div id="logs-container" class="mt-4 bg-slate-900 rounded-lg p-4 h-48 overflow-y-auto no-scrollbar font-mono text-sm shadow-inner"></div>
+        </div>
+    </div>
+
+    <!-- 理论讲解区：浅显易懂版 -->
+    <div class="mt-8 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-slate-800 border-b pb-4">
+            <i data-lucide="book-open" class="w-6 h-6 text-indigo-600"></i>
+            📚 算法探秘：从理论到落地
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- 理论卡片 1 -->
+            <div class="bg-indigo-50/50 p-5 rounded-xl border border-indigo-100 hover:shadow-md transition-shadow">
+                <h3 class="font-bold text-indigo-900 flex items-center gap-2 mb-3">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-indigo-500"></i>
+                    1. 算法是怎么来的？
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                    <strong>传统痛点：</strong>以前抓财务造假，靠的是“死规则”（比如：单笔转账超过5万就报警）。但现在的造假手段很狡猾，他们会拆分金额、伪装IP，轻易绕过规则。
+                </p>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    <strong>解决思路：</strong>我们需要一种既能像侦探一样发现隐蔽线索，又能做到公平客观、不误判的方法。于是，本系统将“提取线索的高手”（深度学习）和“投票决策的专家团”（集成学习）拼接在了一起，这就是 <strong>DRF (深度随机森林)</strong> 算法的诞生初衷。
+                </p>
+            </div>
+
+            <!-- 理论卡片 2 -->
+            <div class="bg-emerald-50/50 p-5 rounded-xl border border-emerald-100 hover:shadow-md transition-shadow">
+                <h3 class="font-bold text-emerald-900 flex items-center gap-2 mb-3">
+                    <i data-lucide="puzzle" class="w-5 h-5 text-emerald-500"></i>
+                    2. 基于什么理论支撑？
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                    算法的成功实现，依赖于两大核心AI理论：
+                </p>
+                <div class="space-y-3">
+                    <div class="bg-white p-3 rounded-lg border border-emerald-100 text-sm shadow-sm">
+                        <div class="text-emerald-700 font-bold mb-1 flex items-center gap-1">
+                            <i data-lucide="search" class="w-4 h-4"></i> 理论一：深度特征提取 (CNN)
+                        </div>
+                        <div class="text-slate-600">它打破了只看表面数字的局限。就像把财报当成图片来扫描，自动发现“小额+异常时间+新IP = 高风险”这种人眼难以察觉的<strong>深层关联规律</strong>。</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-emerald-100 text-sm shadow-sm">
+                        <div class="text-emerald-700 font-bold mb-1 flex items-center gap-1">
+                            <i data-lucide="users" class="w-4 h-4"></i> 理论二：集成学习 (随机森林)
+                        </div>
+                        <div class="text-slate-600">它解决了“一个人容易看走眼”的问题。系统不依赖单一模型，而是构建了100棵“决策树”，大家根据各自拿到的线索<strong>独立投票</strong>，少数服从多数，确保结论极其稳健。</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 理论卡片 3 -->
+            <div class="bg-amber-50/50 p-5 rounded-xl border border-amber-100 hover:shadow-md transition-shadow">
+                <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-3">
+                    <i data-lucide="list-ordered" class="w-5 h-5 text-amber-500"></i>
+                    3. 在财务上的具体分步应用
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                    当一笔交易发生时，算法是这样一步步“审查”它的：
+                </p>
+                <ul class="text-sm text-slate-600 space-y-2 relative">
+                    <li class="flex gap-2">
+                        <span class="bg-amber-200 text-amber-800 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs">1</span>
+                        <span><strong>汇总线索：</strong>收集交易的时间、金额、频率、设备IP等所有碎片信息。</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="bg-amber-200 text-amber-800 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs">2</span>
+                        <span><strong>提纯特征：</strong>CNN模型像滤网一样，剔除无用信息，将碎片数据转化为具有风控价值的“高阶特征”。</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="bg-amber-200 text-amber-800 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs">3</span>
+                        <span><strong>专家评审：</strong>将高阶特征分发给随机森林中的上百棵决策树，每棵树独立做出“正常”或“异常”的判断。</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="bg-amber-200 text-amber-800 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs">4</span>
+                        <span><strong>拦截裁决：</strong>汇总所有树的选票，得出最终结论。如有问题，瞬间亮红灯拦截。</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 核心交互逻辑 (Vanilla JS) -->
+    <script>
+        // --- API 配置区 ---
+        const apiKey = ""; // 执行环境将自动注入 API Key
+
+        // 带有指数退避重试的 Gemini API 调用封装
+        async function fetchGeminiWithRetry(prompt, retries = 5) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { 
+                    parts: [{ text: "你是一位资深的银行风控审计专家。请以专业、严谨、简明扼要的口吻输出分析报告。直接输出报告内容，无需任何客套话语或额外解释。" }] 
+                }
+            };
+
+            const delays = [1000, 2000, 4000, 8000, 16000]; // 指数退避延迟时间(ms)
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "未生成任何内容。";
+                } catch (error) {
+                    if (i === retries - 1) throw error; // 如果是最后一次尝试，直接抛出错误
+                    console.warn(`调用大语言模型失败，第 ${i + 1} 次重试，等待 ${delays[i]}ms...`);
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
+
+        // 模拟论文中的 Table 1 银行交易数据
+        const mockTransactions = [
+            { id: '1001', customer: 'C001', date: '2023-12-10 14:33', amount: 700.00, type: '转账', target: 'T001', freq: '高', location: '北京', device: 'Android', ip: '192.168.1.100', isFraud: false },
+            { id: '1002', customer: 'C002', date: '2023-12-10 15:49', amount: 1500.00, type: '提现', target: '-', freq: '中', location: '上海', device: 'iPhone', ip: '192.168.1.101', isFraud: false },
+            { id: '1003', customer: 'C003', date: '2023-12-10 16:06', amount: 10900.00, type: '转账', target: 'T002', freq: '低', location: '广州', device: 'Windows', ip: '192.168.1.102', isFraud: false },
+            { id: '1004', customer: 'C004', date: '2023-12-10 17:14', amount: 53000.00, type: '存款/异常支付', target: '-', freq: '高', location: '深圳', device: 'Linux', ip: '192.168.1.103', isFraud: true }, // 高危异常
+            { id: '1005', customer: 'C005', date: '2023-12-10 18:37', amount: 300.00, type: '支付', target: 'T003', freq: '中', location: '杭州', device: 'Android', ip: '192.168.1.104', isFraud: false },
+        ];
+
+        // 全局状态管理
+        const state = {
+            selectedTx: mockTransactions[0],
+            status: 'idle', // 可选值: idle, cnn, rf, done
+            logs: [],
+            aiReport: null,             // 存储 AI 生成的报告
+            isGeneratingReport: false   // AI 报告生成状态
+        };
+
+        // --- 渲染函数 ---
+
+        function renderTransactions() {
+            const container = document.getElementById('tx-list');
+            const isBusy = state.status !== 'idle' && state.status !== 'done';
+            
+            container.innerHTML = mockTransactions.map(tx => {
+                const isSelected = state.selectedTx.id === tx.id;
+                const activeClass = isSelected ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-400' : 'bg-white border-slate-200 hover:bg-slate-50';
+                const disabledClass = isBusy ? 'opacity-50 cursor-not-allowed pointer-events-none' : '';
+                
+                return `
+                <div onclick="selectTx('${tx.id}')" class="p-3 rounded-lg border cursor-pointer transition-all ${activeClass} ${disabledClass}">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-slate-700">ID: ${tx.id}</span>
+                        <span class="text-sm font-semibold text-slate-500">￥${tx.amount.toFixed(2)}</span>
+                    </div>
+                    <div class="text-xs text-slate-500 flex justify-between">
+                        <span>${tx.location} | ${tx.device}</span>
+                        <span>频率: ${tx.freq}</span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderButton() {
+            const container = document.getElementById('btn-container');
+            const isBusy = state.status === 'cnn' || state.status === 'rf';
+
+            container.innerHTML = `
+                <button 
+                    onclick="handleAnalyze()" 
+                    ${isBusy ? 'disabled' : ''} 
+                    class="mt-6 w-full ${isBusy ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors flex items-center justify-center gap-2"
+                >
+                    ${isBusy ? `<i data-lucide="activity" class="animate-spin w-5 h-5"></i> 分析中...` : '启动 DRF 算法流程'}
+                </button>
+            `;
+            lucide.createIcons({ root: container });
+        }
+
+        function renderPipeline() {
+            const container = document.getElementById('pipeline-container');
+            const { status, selectedTx } = state;
+            
+            const isIdle = status === 'idle';
+            const isCnn = status === 'cnn';
+            const isRf = status === 'rf';
+            const isDone = status === 'done';
+            const isFraud = selectedTx.isFraud;
+
+            // 固定决策树的高度，避免渲染时闪烁
+            const treeHeights = [65, 85, 45];
+
+            container.innerHTML = `
+                <!-- 阶段 1: 原始数据 -->
+                <div class="flex flex-col items-center w-1/4">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mb-3 transition-all duration-500 ${!isIdle ? 'bg-blue-100 border-2 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'bg-slate-100 border-2 border-slate-200'}">
+                        <i data-lucide="server" class="w-8 h-8 md:w-10 md:h-10 ${!isIdle ? 'text-blue-600' : 'text-slate-400'}"></i>
+                    </div>
+                    <div class="text-xs md:text-sm font-bold text-slate-700 text-center">多维数据汇总</div>
+                    <div class="text-[10px] md:text-xs text-slate-500 mt-1 text-center hidden md:block">金额/时间/设备/IP</div>
+                </div>
+
+                <i data-lucide="arrow-right" class="w-6 h-6 md:w-8 md:h-8 transition-colors duration-500 ${isCnn || isRf || isDone ? 'text-blue-500 animate-pulse' : 'text-slate-200'}"></i>
+
+                <!-- 阶段 2: CNN -->
+                <div class="flex flex-col items-center w-1/4">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-3 transition-all duration-500 relative ${isCnn ? 'bg-purple-100 border-4 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.6)] scale-110' : isRf || isDone ? 'bg-purple-50 border-2 border-purple-300' : 'bg-slate-100 border-2 border-slate-200'}">
+                        <i data-lucide="cpu" class="w-8 h-8 md:w-10 md:h-10 ${isCnn ? 'text-purple-600 animate-pulse' : isRf || isDone ? 'text-purple-400' : 'text-slate-400'}"></i>
+                        ${isCnn ? '<div class="absolute inset-0 rounded-full border-4 border-purple-400 opacity-50 animate-ping"></div>' : ''}
+                    </div>
+                    <div class="text-xs md:text-sm font-bold text-slate-700 text-center">深度特征提纯</div>
+                    <div class="text-[10px] md:text-xs text-slate-500 mt-1 text-center hidden md:block">CNN寻找隐蔽线索</div>
+                </div>
+
+                <i data-lucide="arrow-right" class="w-6 h-6 md:w-8 md:h-8 transition-colors duration-500 ${isRf || isDone ? 'text-purple-500 animate-pulse' : 'text-slate-200'}"></i>
+
+                <!-- 阶段 3: Random Forest -->
+                <div class="flex flex-col items-center w-1/4">
+                    <div class="w-20 h-16 md:w-24 md:h-20 flex items-center justify-center gap-1 mb-3 transition-all duration-500 ${isRf ? 'scale-110' : ''}">
+                        ${[0, 1, 2].map(index => {
+                            const bgClass = isRf ? 'bg-green-100 border-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]' : isDone ? (isFraud ? 'bg-red-100 border-red-400' : 'bg-green-100 border-green-400') : 'bg-slate-100 border-slate-200';
+                            const fillClass = isRf ? 'bg-green-400 animate-pulse' : isDone ? (isFraud ? 'bg-red-400' : 'bg-green-400') : 'bg-slate-300';
+                            return `
+                            <div class="w-5 h-10 md:w-6 md:h-12 rounded flex flex-col items-center justify-end overflow-hidden transition-all duration-300 border ${bgClass}">
+                                <div class="w-full ${fillClass}" style="height: ${treeHeights[index]}%"></div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="text-xs md:text-sm font-bold text-slate-700 text-center">百人专家评审</div>
+                    <div class="text-[10px] md:text-xs text-slate-500 mt-1 text-center hidden md:block">随机森林独立投票</div>
+                </div>
+            `;
+            lucide.createIcons({ root: container });
+        }
+
+        function renderResult() {
+            const container = document.getElementById('result-container');
+            const { status, selectedTx, aiReport, isGeneratingReport } = state;
+            const isDone = status === 'done';
+            const isFraud = selectedTx.isFraud;
+
+            let html = `
+                <div class="w-full transition-all duration-500 transform ${isDone ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none absolute'}">
+                    ${isDone ? `
+                    <!-- 核心裁决卡片 -->
+                    <div class="p-4 md:p-6 rounded-2xl border-2 shadow-lg flex items-center justify-between ${isFraud ? 'bg-red-50 border-red-500' : 'bg-green-50 border-green-500'}">
+                        <div>
+                            <div class="text-sm font-bold text-slate-500 mb-1">系统最终裁决</div>
+                            <div class="text-xl md:text-2xl font-black ${isFraud ? 'text-red-600' : 'text-green-600'}">
+                                ${isFraud ? '🚨 拦截：高危欺诈交易' : '✅ 放行：符合正常模式'}
+                            </div>
+                        </div>
+                        <div>
+                            <i data-lucide="${isFraud ? 'shield-alert' : 'shield-check'}" class="w-12 h-12 md:w-16 md:h-16 ${isFraud ? 'text-red-500' : 'text-green-500'}"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- AI 智能分析与审计报告区域 -->
+                    <div class="mt-4 w-full">
+                        ${!aiReport && !isGeneratingReport ? `
+                            <button onclick="generateAuditReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                                ✨ 生成智能审计分析报告
+                            </button>
+                        ` : ''}
+                        
+                        ${isGeneratingReport ? `
+                            <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-xl flex flex-col items-center justify-center gap-3 text-indigo-700 shadow-inner">
+                                <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-indigo-500"></i> 
+                                <span class="font-semibold">AI大模型正在根据交易特征撰写分析报告，请稍候...</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${aiReport && !isGeneratingReport ? `
+                            <div class="bg-white border border-indigo-200 rounded-xl overflow-hidden shadow-md animate-fade-in-up">
+                                <div class="bg-gradient-to-r from-indigo-100 to-purple-100 px-4 py-3 border-b border-indigo-200 flex justify-between items-center">
+                                    <span class="font-bold text-indigo-900 flex items-center gap-2">
+                                        <i data-lucide="bot" class="w-5 h-5 text-indigo-600"></i> AI 智能审计报告
+                                    </span>
+                                </div>
+                                <div class="p-5 text-sm text-slate-700 prose prose-indigo max-w-none bg-slate-50">
+                                    ${marked.parse(aiReport)}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            if (isDone) lucide.createIcons({ root: container });
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('logs-container');
+            const { status, logs } = state;
+
+            let html = `
+                <div class="text-slate-400 mb-2 flex items-center gap-2 border-b border-slate-700 pb-2">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 算法运行日志终端 (Console)
+                </div>
+            `;
+
+            if (logs.length === 0) {
+                html += `<div class="text-slate-600 italic">等待系统指令...</div>`;
+            } else {
+                html += logs.map(log => `
+                    <div class="text-green-400 animate-fade-in-up mt-1">
+                        <span class="text-slate-500">[${log.time}]</span> ${log.msg}
+                    </div>
+                `).join('');
+            }
+
+            if (status === 'cnn') {
+                html += `<div class="text-purple-400 animate-pulse mt-1">_ 正在启动CNN...深度特征提取中</div>`;
+            }
+            if (status === 'rf') {
+                html += `<div class="text-blue-400 animate-pulse mt-1">_ 正在分发给百棵决策树进行投票...</div>`;
+            }
+            if (state.isGeneratingReport) {
+                html += `<div class="text-indigo-400 animate-pulse mt-1">_ 正在连接 Gemini 大语言模型生成审计报告...</div>`;
+            }
+
+            container.innerHTML = html;
+            lucide.createIcons({ root: container });
+            
+            // 自动滚动到底部
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- 核心交互逻辑 ---
+
+        function updateAllUI() {
+            renderTransactions();
+            renderButton();
+            renderPipeline();
+            renderResult();
+            renderLogs();
+        }
+
+        function addLog(msg) {
+            const time = new Date().toLocaleTimeString();
+            state.logs.push({ time, msg });
+            // 更新一次日志视图
+            renderLogs();
+        }
+
+        window.selectTx = function(id) {
+            if (state.status === 'cnn' || state.status === 'rf') return; // 分析中禁止切换
+            state.selectedTx = mockTransactions.find(t => t.id === id);
+            
+            // 重置状态
+            state.status = 'idle';
+            state.logs = [];
+            state.aiReport = null;
+            state.isGeneratingReport = false;
+            
+            updateAllUI();
+        };
+
+        window.handleAnalyze = function() {
+            if (state.status === 'cnn' || state.status === 'rf') return;
+
+            // 1. 触发 CNN 阶段
+            state.status = 'cnn';
+            state.logs = [];
+            addLog(`[第一步：数据汇总] 开始分析交易流水 ID: ${state.selectedTx.id}`);
+            updateAllUI();
+
+            // 2. 模拟延迟后进入 随机森林(RF) 阶段
+            setTimeout(() => {
+                addLog(`[第二步：特征提纯] CNN神经网络正在过滤表面干扰信息...`);
+                addLog(`[第二步：特征提纯] 已成功提取高阶风险特征 (如：大额度与异常设备关联)`);
+                state.status = 'rf';
+                updateAllUI();
+
+                // 3. 模拟延迟后完成分析
+                setTimeout(() => {
+                    addLog(`[第三步：专家评审] 将特征下发至随机森林集成模型...`);
+                    addLog(`[第三步：专家评审] 100棵决策树已完成独立投票`);
+                    state.status = 'done';
+                    addLog(`[第四步：最终裁决] 分析流水线执行完毕，得出判定结果`);
+                    updateAllUI();
+                }, 2000);
+            }, 2000);
+        };
+        
+        // 触发调用 Gemini 接口生成报告
+        window.generateAuditReport = async function() {
+            state.isGeneratingReport = true;
+            updateAllUI();
+            addLog("[AI大模型] 正在获取交易上下文并请求 Gemini...");
+
+            const { selectedTx } = state;
+            const isFraudText = selectedTx.isFraud ? "高危欺诈异常交易" : "符合历史模式的正常交易";
+            
+            // 构建提供给大语言模型的 Prompt
+            const prompt = `
+作为专业的银行风控审计专家，请根据以下由深度随机森林(DRF)算法检测出的交易结果，为审计团队撰写一份简明扼要的财务审计分析报告。
+
+【交易基础信息】
+- 交易ID：${selectedTx.id}
+- 客户账号：${selectedTx.customer}
+- 交易时间：${selectedTx.date}
+- 交易金额：￥${selectedTx.amount}
+- 交易类型：${selectedTx.type}
+- 交易发生地：${selectedTx.location}
+- 终端设备：${selectedTx.device}
+- 客户近期交易频率：${selectedTx.freq}
+
+【系统模型判定结果】
+判定结论：该交易属于 **${isFraudText}**。
+
+【报告输出要求】
+1. **特征推理**：分析该笔交易为何被判定为该结果，请结合金额大小、设备属性（如Linux设备往往异于常人）、交易频率等特征进行风控推理。
+2. **审计建议**：给出风控部门或审计团队的明确建议（如需冻结、电话核实、正常归档等）。
+3. 使用 Markdown 格式进行结构化排版（分点作答）。
+`;
+
+            try {
+                const report = await fetchGeminiWithRetry(prompt);
+                state.aiReport = report;
+                addLog("[AI大模型] 智能审计报告生成完毕并渲染成功！");
+            } catch (error) {
+                console.error(error);
+                state.aiReport = "❌ 生成智能审计报告时发生网络或服务端错误，请检查 API 配置或稍后再试。\n\n**错误信息**：" + error.message;
+                addLog("[系统错误] AI 分析服务调用失败。");
+            } finally {
+                state.isGeneratingReport = false;
+                updateAllUI();
+            }
+        };
+
+        // --- 初始化应用 ---
+        window.onload = () => {
+            updateAllUI();
+            lucide.createIcons(); // 首次渲染图标
+        };
+    </script>
+</body>
+</html>
