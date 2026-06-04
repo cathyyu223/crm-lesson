@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统运行演示与理论分析 - 融合NLP与MAS的财务系统</title>
+    <!-- 引入 Tailwind CSS 进行快速美化 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .highlight-word { transition: all 0.3s ease; border-radius: 4px; padding: 2px 4px; margin: 0 2px; }
+        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        
+        /* 智能体连线动画 */
+        .agent-line {
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, #3b82f6, transparent);
+            background-size: 100% 200%;
+            animation: flowDown 2s linear infinite;
+        }
+        @keyframes flowDown {
+            0% { background-position: 0 -100%; }
+            100% { background-position: 0 100%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <!-- 顶部导航栏 -->
+    <nav class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-gears text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-wider">系统运行演示与理论分析</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="flex items-baseline space-x-4">
+                        <span class="text-indigo-200 text-sm">基于自然语言处理 (NLP) 与多智能体系统 (MAS)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主体内容 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- 步骤指示器 -->
+        <div class="mb-8 bg-white rounded-xl shadow-sm p-4 flex justify-around items-center relative overflow-hidden">
+            <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+            
+            <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn relative z-10 flex flex-col items-center group">
+                <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-110"><i class="fa-solid fa-language"></i></div>
+                <span class="mt-2 text-sm font-semibold text-indigo-600">环节一：NLP 语义解析</span>
+            </button>
+            
+            <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn relative z-10 flex flex-col items-center group">
+                <div class="w-12 h-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-110"><i class="fa-solid fa-network-wired"></i></div>
+                <span class="mt-2 text-sm font-semibold text-gray-500">环节二：MAS 智能体协同</span>
+            </button>
+        </div>
+
+        <!-- 页面内容区 -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 min-h-[600px]">
+            
+            <!-- 环节一：NLP 演示与理论 -->
+            <div id="section-1" class="section-content fade-in block">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- 左侧：演示区 -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-blue-500 pl-4">步骤演示：非结构化文本解析</h2>
+                        <div class="bg-slate-100 rounded-xl p-6 border border-slate-200">
+                            <h3 class="font-bold text-lg mb-4 text-slate-700"><i class="fa-solid fa-keyboard mr-2"></i>模拟财务输入端（请点击解析）</h3>
+                            
+                            <div class="bg-white p-4 rounded-lg shadow-inner text-lg leading-relaxed mb-6 font-medium text-gray-700" id="nlp-text-box">
+                                <span id="word-1">新中联华商贸公司</span>于<span id="word-2">5月12日</span><span id="word-3">支付</span>了<span id="word-4">研发测试设备尾款</span>人民币<span id="word-5">50,000元整</span>，该设备系<span id="word-6">专门用于研发活动的仪器，非研发最终成果</span>。
+                            </div>
+                            
+                            <div class="flex justify-center mb-6">
+                                <button onclick="runNLPAnimation()" id="nlp-btn" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-lg flex items-center">
+                                    <i class="fa-solid fa-microchip mr-2"></i> 开始深度语义解析 (NER)
+                                </button>
+                            </div>
+
+                            <!-- 解析结果展示区 -->
+                            <div id="nlp-result" class="hidden opacity-0 transition-opacity duration-1000">
+                                <h4 class="font-bold text-gray-700 mb-3 border-b pb-2">实体提取与映射结果：</h4>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="bg-green-50 p-3 rounded border border-green-200 shadow-sm">
+                                        <span class="block text-xs text-green-600 font-bold mb-1">主体实体 (B-ORG)</span>
+                                        <span class="font-semibold text-gray-800">新中联华商贸公司</span>
+                                    </div>
+                                    <div class="bg-blue-50 p-3 rounded border border-blue-200 shadow-sm">
+                                        <span class="block text-xs text-blue-600 font-bold mb-1">金额实体 (B-AMOUNT)</span>
+                                        <span class="font-semibold text-gray-800">¥ 50,000.00</span>
+                                    </div>
+                                    <div class="bg-purple-50 p-3 rounded border border-purple-200 shadow-sm">
+                                        <span class="block text-xs text-purple-600 font-bold mb-1">业务行为特征</span>
+                                        <span class="font-semibold text-gray-800">支付 / 设备尾款</span>
+                                    </div>
+                                    <div class="bg-rose-50 p-3 rounded border border-rose-200 shadow-sm">
+                                        <span class="block text-xs text-rose-600 font-bold mb-1">会计科目映射</span>
+                                        <span class="font-semibold text-gray-800"><i class="fa-solid fa-arrow-right text-rose-400"></i> 固定资产 (资本化)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：理论分析区 -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-indigo-500 pl-4">核心理论：BERT-BiLSTM-CRF 架构</h2>
+                        <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-100">
+                            <p class="text-gray-700 mb-4 text-sm leading-relaxed font-semibold">
+                                突破传统系统无法处理非标准文本的瓶颈，如同流水线般精准提取财务实体：
+                            </p>
+                            <ul class="space-y-4">
+                                <li class="bg-white p-4 rounded shadow-sm flex items-center">
+                                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full mr-4"><i class="fa-solid fa-book-open text-xl"></i></div>
+                                    <div>
+                                        <strong class="text-gray-800 text-base">1. BERT (语义理解)</strong>
+                                        <p class="text-sm text-gray-600 mt-1">精准捕捉上下文，理解“人民币”与“50,000元”的深层关联。</p>
+                                    </div>
+                                </li>
+                                <li class="bg-white p-4 rounded shadow-sm flex items-center">
+                                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full mr-4"><i class="fa-solid fa-bullseye text-xl"></i></div>
+                                    <div>
+                                        <strong class="text-gray-800 text-base">2. BiLSTM + Attention (逻辑聚焦)</strong>
+                                        <p class="text-sm text-gray-600 mt-1">双向推理业务因果，高亮“非研发最终成果”等区别于研发支出的资本化核心特征。</p>
+                                    </div>
+                                </li>
+                                <li class="bg-white p-4 rounded shadow-sm flex items-center">
+                                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full mr-4"><i class="fa-solid fa-clipboard-check text-xl"></i></div>
+                                    <div>
+                                        <strong class="text-gray-800 text-base">3. CRF (合规审核)</strong>
+                                        <p class="text-sm text-gray-600 mt-1">严格执行财务标记约束，确保提取序列 100% 合法，大幅降低错误率。</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                            <!-- 核心突破展示框 -->
+                            <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-5 rounded-r-lg shadow-sm relative overflow-hidden">
+                                <div class="absolute -right-4 -top-4 text-yellow-200 opacity-30 text-6xl"><i class="fa-solid fa-lightbulb"></i></div>
+                                <h4 class="text-yellow-800 font-bold mb-2 text-sm flex items-center"><i class="fa-solid fa-star text-yellow-500 mr-2 text-lg"></i> 核心突破：语义级精准分类</h4>
+                                <p class="text-sm text-yellow-900 leading-relaxed font-medium relative z-10">
+                                    传统的系统遇到带“研发”字眼的文本，常通过简单正则匹配，错误地将其直接费用化计入“研发支出”。<br><br>
+                                    而本系统的 <span class="bg-yellow-200 px-1 rounded">BiLSTM+Attention</span> 能够读懂“专用仪器”、“非最终成果”这种长尾定语，准确判断它适用《固定资产准则》。这正是传统规则引擎无法做到的<strong>语义级精准分类</strong>。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 环节二：MAS 演示与理论 -->
+            <div id="section-2" class="section-content fade-in hidden">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- 左侧：演示区 -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-emerald-500 pl-4">步骤演示：具体业务入账流转</h2>
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-200 relative">
+                            <!-- 控制面板 -->
+                            <div class="flex justify-between items-center mb-6 bg-white p-3 rounded shadow-sm border border-emerald-200">
+                                <span class="font-bold text-gray-700 text-sm">承接环节一的 50,000 元设备款：</span>
+                                <button onclick="runMASAnimation()" id="mas-btn" class="px-4 py-2 bg-emerald-500 text-white rounded text-sm font-bold hover:bg-emerald-600 shadow transition flex items-center">
+                                    <i class="fa-solid fa-play mr-2"></i> 开始 MAS 自动流转
+                                </button>
+                            </div>
+
+                            <!-- 智能体架构图 -->
+                            <div class="space-y-4">
+                                <!-- 智能体 1 -->
+                                <div class="bg-white p-3 rounded-lg shadow border-l-4 border-emerald-500 flex items-center justify-between transition-all duration-300" id="agent-box-1">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-lg mr-3"><i class="fa-solid fa-database"></i></div>
+                                        <div>
+                                            <h3 class="font-bold text-sm text-gray-800">数据校验智能体</h3>
+                                            <p class="text-[10px] text-gray-500 mt-1">跨系统核对网银流水单号与金额。</p>
+                                        </div>
+                                    </div>
+                                    <div id="agent-1-status" class="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded">等待接入</div>
+                                </div>
+
+                                <!-- 智能体 2 (核心) -->
+                                <div class="bg-white p-3 rounded-lg shadow border-l-4 border-amber-500 flex items-center justify-between transition-all duration-300 relative" id="agent-box-2">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-lg mr-3"><i class="fa-solid fa-scale-balanced"></i></div>
+                                        <div>
+                                            <h3 class="font-bold text-sm text-gray-800">规则适配智能体</h3>
+                                            <p class="text-[10px] text-gray-500 mt-1">结合 NLP 标签，匹配并生成会计分录。</p>
+                                        </div>
+                                    </div>
+                                    <div id="agent-2-status" class="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded">等待特征</div>
+                                </div>
+
+                                <!-- 智能体 3 -->
+                                <div class="bg-white p-3 rounded-lg shadow border-l-4 border-purple-500 flex items-center justify-between transition-all duration-300" id="agent-box-3">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-lg mr-3"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                                        <div>
+                                            <h3 class="font-bold text-sm text-gray-800">报表生成智能体</h3>
+                                            <p class="text-[10px] text-gray-500 mt-1">更新底层总账与资产负债表。</p>
+                                        </div>
+                                    </div>
+                                    <div id="agent-3-status" class="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded">等待分录</div>
+                                </div>
+                            </div>
+
+                            <!-- 系统反馈控制台 -->
+                            <div class="mt-6 bg-gray-900 rounded-lg p-3 font-mono text-xs text-green-400 shadow-inner h-36 overflow-y-auto" id="console-output">
+                                > 等待启动，已获取 NLP 提取的【实体】与【特征】...<br>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：理论分析区 -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-teal-500 pl-4">案例剖析：MAS 如何替代人工？</h2>
+                        <div class="bg-teal-50 rounded-xl p-6 border border-teal-100 h-full">
+                            <p class="text-gray-700 mb-4 text-sm leading-relaxed font-semibold">
+                                在实际业务中，系统将繁琐的“对账-写分录-登账”过程拆解，交由三个智能体(Agent)接力完成，彻底消除人工干预：
+                            </p>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="font-bold text-gray-800 text-base flex items-center"><i class="fa-solid fa-shield-halved text-teal-600 w-6"></i>1. 跨源数据防伪 (校验 Agent)</h4>
+                                    <p class="text-sm text-gray-600 mt-2">
+                                        不仅仅依赖文本提取，它会自动跨系统调用银行接口，核实 <span class="text-teal-700 font-bold">50,000元</span> 是否真实出账。如果合同文本金额与流水不符，系统会立刻熔断拦截。
+                                    </p>
+                                </div>
+
+                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="font-bold text-gray-800 text-base flex items-center"><i class="fa-solid fa-code-branch text-amber-500 w-6"></i>2. 动态分录路由 (规则 Agent)</h4>
+                                    <p class="text-sm text-gray-600 mt-2">
+                                        基于效用函数，系统拒绝了“研发=费用”的死规则。它接收到 NLP 传来的“专用仪器”特征后，自动路由至《固定资产准则》，生成准确的分录：<br>
+                                        <span class="bg-amber-50 text-amber-800 px-2 py-1 rounded inline-block mt-2 font-mono text-xs font-bold border border-amber-200">借：固定资产 50,000 | 贷：银行存款 50,000</span>
+                                    </p>
+                                </div>
+
+                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="font-bold text-gray-800 text-base flex items-center"><i class="fa-solid fa-table-list text-purple-500 w-6"></i>3. 直达底层报表 (生成 Agent)</h4>
+                                    <p class="text-sm text-gray-600 mt-2">
+                                        拿到分录后，瞬间同步更新资产负债表。财务人员免去了期末逐笔登总账、拉表格的繁重劳动，实现了从业务发生到报表出具的<strong class="text-purple-600 text-base">“秒级直达”</strong>。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 标签页切换逻辑 ---
+        function switchTab(tabId) {
+            // 隐藏所有内容
+            document.querySelectorAll('.section-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            // 恢复所有按钮状态
+            document.querySelectorAll('.tab-btn div').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white');
+                el.classList.add('bg-gray-300', 'text-gray-600');
+            });
+            document.querySelectorAll('.tab-btn span').forEach(el => {
+                el.classList.remove('text-indigo-600');
+                el.classList.add('text-gray-500');
+            });
+
+            // 显示选中内容
+            const targetSection = document.getElementById(`section-${tabId}`);
+            targetSection.classList.remove('hidden');
+            targetSection.classList.add('block');
+
+            // 高亮选中按钮
+            const targetBtnDiv = document.querySelector(`#tab-btn-${tabId} div`);
+            const targetBtnSpan = document.querySelector(`#tab-btn-${tabId} span`);
+            targetBtnDiv.classList.remove('bg-gray-300', 'text-gray-600');
+            targetBtnDiv.classList.add('bg-indigo-600', 'text-white');
+            targetBtnSpan.classList.remove('text-gray-500');
+            targetBtnSpan.classList.add('text-indigo-600');
+        }
+
+        // --- 环节一：NLP 动画演示逻辑 ---
+        function runNLPAnimation() {
+            const btn = document.getElementById('nlp-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 模型推理提取中...';
+            btn.classList.replace('bg-blue-600', 'bg-gray-500');
+            btn.disabled = true;
+
+            // 重置高亮状态 (以防重复点击)
+            const words = document.querySelectorAll('[id^="word-"]');
+            words.forEach(w => w.className = "");
+
+            // 模拟流式高亮特征文本
+            setTimeout(() => { document.getElementById('word-1').className = "highlight-word bg-green-200 text-green-800 font-bold shadow-sm"; }, 600);
+            setTimeout(() => { 
+                document.getElementById('word-3').className = "highlight-word bg-purple-200 text-purple-800 font-bold shadow-sm"; 
+                document.getElementById('word-4').className = "highlight-word bg-purple-200 text-purple-800 font-bold shadow-sm"; 
+            }, 1200);
+            setTimeout(() => { 
+                document.getElementById('word-5').className = "highlight-word bg-blue-200 text-blue-800 font-bold shadow-sm text-lg border border-blue-400 pulse"; 
+                document.getElementById('word-6').className = "highlight-word bg-rose-200 text-rose-800 font-bold shadow-sm border border-rose-400 pulse"; 
+            }, 1800);
+
+            // 渐显展示结果映射面板
+            setTimeout(() => {
+                const resultPanel = document.getElementById('nlp-result');
+                resultPanel.classList.remove('hidden');
+                setTimeout(() => resultPanel.classList.remove('opacity-0'), 50); 
+                
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> 语义解析完成，准备交由 MAS 层';
+                btn.classList.replace('bg-gray-500', 'bg-emerald-500');
+            }, 3000);
+        }
+
+        // --- 环节二：MAS 具体案例流转模拟 ---
+        function appendConsole(text) {
+            const consoleEl = document.getElementById('console-output');
+            consoleEl.innerHTML += `<br>> ${text}`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function runMASAnimation() {
+            const btn = document.getElementById('mas-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> MAS 自动流转中...';
+
+            const consoleEl = document.getElementById('console-output');
+            consoleEl.innerHTML = '> MAS 协作层启动，开始处理单笔业务...<br>';
+            
+            // 步骤 1：校验 Agent
+            setTimeout(() => {
+                document.getElementById('agent-box-1').classList.add('scale-105', 'shadow-md', 'z-10');
+                document.getElementById('agent-1-status').className = 'text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded';
+                document.getElementById('agent-1-status').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> 核验流水...';
+                appendConsole('校验 Agent：调取网银接口，比对交易特征与金额...');
+            }, 500);
+
+            setTimeout(() => {
+                document.getElementById('agent-1-status').innerHTML = '<i class="fa-solid fa-check mr-1"></i> 流水吻合';
+                appendConsole('<span class="text-emerald-400">校验 Agent：[通过] 交易流水单号 TX-8921，金额 ¥50,000 真实出账。</span>');
+                document.getElementById('agent-box-1').classList.remove('scale-105', 'shadow-md', 'z-10');
+            }, 2000);
+
+            // 步骤 2：规则 Agent
+            setTimeout(() => {
+                document.getElementById('agent-box-2').classList.add('scale-105', 'shadow-md', 'z-10');
+                document.getElementById('agent-2-status').className = 'text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded';
+                document.getElementById('agent-2-status').innerHTML = '<i class="fa-solid fa-gears fa-spin mr-1"></i> 匹配规则...';
+                appendConsole('规则 Agent：接收 NLP 特征 [专用仪器，非最终成果]...');
+                appendConsole('规则 Agent：动态计算最优准则，抛弃[研发支出费用化]...');
+            }, 3000);
+
+            setTimeout(() => {
+                document.getElementById('agent-2-status').innerHTML = '<i class="fa-solid fa-check mr-1"></i> 借:固定资产';
+                appendConsole('<span class="text-amber-400">规则 Agent：[决策] 适用《固定资产准则》，生成分录 -> 借记固定资产，贷记银行存款。</span>');
+                document.getElementById('agent-box-2').classList.remove('scale-105', 'shadow-md', 'z-10');
+            }, 5000);
+
+            // 步骤 3：生成 Agent
+            setTimeout(() => {
+                document.getElementById('agent-box-3').classList.add('scale-105', 'shadow-md', 'z-10');
+                document.getElementById('agent-3-status').className = 'text-xs font-bold text-purple-600 bg-purple-50 border border-purple-200 px-2 py-1 rounded';
+                document.getElementById('agent-3-status').innerHTML = '<i class="fa-solid fa-pen-to-square pulse mr-1"></i> 登账重算...';
+                appendConsole('生成 Agent：接收分录数据，开始双向映射更新底层报表...');
+            }, 6000);
+
+            setTimeout(() => {
+                document.getElementById('agent-3-status').innerHTML = '<i class="fa-solid fa-check mr-1"></i> 报表更新完毕';
+                appendConsole('<span class="text-purple-400">生成 Agent：[完毕] 资产负债表 -> 固定资产期末余额 +50,000，货币资金期末余额 -50,000。</span>');
+                document.getElementById('agent-box-3').classList.remove('scale-105', 'shadow-md', 'z-10');
+                
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> 业务全自动入账完成';
+                btn.classList.replace('bg-emerald-500', 'bg-gray-500');
+                appendConsole('<br><span class="text-white font-bold">> 本次流转耗时: 1.2秒 (人工耗时预计 15 分钟)。流程结束。</span>');
+            }, 8000);
+        }
+    </script>
+</body>
+</html>
